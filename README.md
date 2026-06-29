@@ -1,99 +1,64 @@
 # Focus DE
 
-Focus DE is a minimal, activity-based Linux desktop (Sway-based) that hosts real
-applications inside tabbed, split activities with a pastel / borderless look.
+> Un bureau Linux **par activités**, pas par fenêtres. Clair, pastel, sans bordures —
+> conçu pour se concentrer, et idéal pour un Raspberry Pi familial.
 
-This repository contains the whole desktop as a **payload tree that mirrors `/`**,
-plus install tooling — so deploying it is just "extract into `/`".
+![L'Accueil de Focus DE](docs/images/home.png)
 
-## Layout
+Focus DE remplace le « tas de fenêtres » habituel par des **activités** : chaque
+projet occupe tout l'écran, se découpe en zones nettes, et l'**Accueil** vous donne
+la vue d'ensemble. Le tout sur **Sway** (Wayland), avec de **vraies** applications
+Linux hébergées dedans.
 
-```
-FocusDE/
-├── rootfs/                     # payload — mirrors / ; extracts straight into the filesystem
-│   ├── usr/local/lib/focusde/  #   shared shell code (activities, applets, panel, theme)
-│   │   └── apps/fmtracker/     #   the FM-Song Tracker app
-│   ├── usr/local/bin/fmtracker #   app launcher
-│   ├── etc/skel/.config/       #   default per-user config (sway, waybar, onyx, fuzzel)
-│   ├── etc/greetd/config.toml  #   login manager → starts Sway
-│   └── usr/share/              #   wayland-sessions + application .desktop entries
-├── scripts/                    # install-deps, install, build-archive, remote, songs
-└── docs/                       # desktop.md (shell internals)
-```
+## Pourquoi Focus DE
 
-Because the defaults live in **`/etc/skel/.config`**, every user created afterwards
-(`adduser …`) automatically gets the Focus DE desktop. The shell code is installed
-once, system-wide, under `/usr/local/lib/focusde/`; the Python scripts locate
-themselves and read/write per-user data under the real `$HOME`.
+- 🎯 **Une chose à la fois.** Une activité = un contexte plein écran. Fini les
+  trente fenêtres éparpillées.
+- 🧩 **Des zones simples.** Écran principal, écran secondaire, panneau d'applets —
+  et des onglets quand une zone reçoit plusieurs apps.
+- 🗂️ **Des hubs thématiques.** *Travailler, Apprendre, Jouer, Naviguer, Créer* :
+  vos applications rangées par usage, automatiquement.
+- 🔌 **Des applets utiles.** Horloge, Notes, Calculatrice, Musique, Rappels — dans
+  le panneau, à portée de main.
+- 🎹 **Des logiciels intégrés.** Dont **FM-Song Tracker**, un tracker de musique MIDI.
+- 🍓 **Léger.** Pensé pour le Raspberry Pi 4 ; s'installe pour **tous** les
+  utilisateurs en une fois.
 
-## Install
+## Le concept en 30 secondes
 
-```sh
-sudo ./scripts/install-deps.sh           # Sway, waybar, fuzzel, foot, greetd, GTK, fluidsynth…
-sudo ./scripts/install.sh --login        # lay payload onto /, seed current user, enable greetd
-```
+| | |
+|---|---|
+| ![Hub Créer](docs/images/hub-creer.png) | **Des hubs** regroupent vos apps par usage. « Créer » réunit les outils de création (dessin, audio…) — et écarte les simples visionneuses. |
+| ![Zones](docs/images/activity-zones.png) | **Une activité, deux écrans** (haut/bas) + un panneau. Les apps multiples deviennent des onglets. |
+| ![Sélecteur d'apps](docs/images/picker.png) | **+ App** : choisissez la zone, puis l'application. Toutes vos apps Linux sont là. |
+| ![Applets](docs/images/applets.png) | **Des applets** dans le panneau : horloge, notes, calculatrice, musique, rappels. |
 
-…or build a relocatable archive and unpack it anywhere:
+## Logiciel intégré : FM-Song Tracker
 
-```sh
-./scripts/build-archive.sh               # -> focusde-rootfs.tar.gz
-sudo tar -C / -xzf focusde-rootfs.tar.gz # extracts every file to its place under /
-```
+![FM-Song Tracker](docs/images/fmtracker.png)
 
-…or build a Debian package (`Architecture: all`, works on the Pi's arm64):
+Un **tracker** de musique : on compose en posant des notes dans une grille, jouées
+par un synthé **MIDI** (fluidsynth + SoundFont General MIDI). Il rouvre même les
+anciens morceaux **`.fms`** de FM-Song. Pilotable au clavier (saisie des notes) et à
+la souris (lecture, instruments, patterns).
 
-```sh
-./scripts/build-deb.sh 0.1.0             # -> focusde_0.1.0_all.deb
-sudo apt install ./focusde_0.1.0_all.deb # pulls in sway/waybar/greetd/fluidsynth/…
-```
-
-CI builds the `.deb` automatically (see `.github/workflows/build-deb.yml`) on a
-`v*` tag or manual dispatch, and uploads it as an artifact. (RPM packaging: later.)
-
-### Login manager (boot straight into the desktop)
-
-The Pi boots into **greetd**, the lightweight login manager for wlroots/Sway. Its
-default session (`/etc/greetd/config.toml`) runs `agreety --cmd sway`: a login
-prompt that, once authenticated, starts **Sway** — which loads the Focus DE shell.
-`install.sh --login` enables it (`systemctl enable greetd`, disabling `getty@tty1`).
-A `usr/share/wayland-sessions/focusde.desktop` entry is also provided so any other
-display manager can offer "Focus DE". (Install `tuigreet` for a nicer login screen.)
-
-## fmtracker — FM-Song Tracker
-
-A keyboard-and-mouse music tracker, reimagining the author's old QBasic/AdLib
-**FM-Song** (and its Onyx/Circle port). Instead of generating sound itself, it
-drives a **MIDI** software synthesizer (**fluidsynth**) with a General-MIDI
-SoundFont — so it gets hundreds of instruments "for free".
-
-- Multi-pattern song with a looping order-list (the original FM-Song model).
-- Up to 16 channels, one GM instrument (program) each.
-- **Keyboard** note entry: note letters `C D E F G A B`; `+` / `-` change octave;
-  **`Ctrl`+`+` / `Ctrl`+`-`** (or **`Ctrl`+`↑` / `Ctrl`+`↓`**) transpose the cell by a
-  semitone; arrows move (up/down = rows/time, left/right = channel/track);
-  Space = note-off, Delete = clear.
-- **Mouse**: Play / Pause / Resume / Stop, add channel, add pattern, choose
-  instrument, set BPM, click a cell to position the cursor.
-- Imports legacy `.fms` FM-Song files (instruments default to piano, with a
-  name-based heuristic to guess a closer General-MIDI preset).
-
-Run it: `fmtracker` (once installed) or, from a checkout, `./scripts/run.sh`.
-Source: [`rootfs/usr/local/lib/focusde/apps/fmtracker/`](rootfs/usr/local/lib/focusde/apps/fmtracker/).
-Get the demo songs: [`scripts/install-songs.sh`](scripts/install-songs.sh).
-
-## Remote access (headless Pi)
-
-View/control the Pi's Sway desktop with no monitor via **WayVNC** (headless Sway
-output + an SSH tunnel):
+## Installation express
 
 ```sh
-./scripts/setup-remote.sh                 # install wayvnc (one time)
-./scripts/sway-headless-vnc.sh 1280x720   # on the Pi: headless Sway + VNC
-ssh -L 5900:localhost:5900 <user>@<pi>    # on your machine: tunnel
-vncviewer localhost:5900                  # any VNC client
+sudo apt install ./focusde_0.1.0_all.deb     # ou : sudo ./scripts/install.sh --login
 ```
 
-See [`docs/desktop.md`](docs/desktop.md) for the shell internals.
+Tout nouvel utilisateur (`adduser …`) obtient ensuite Focus DE automatiquement.
+Détails → **[Guide d'installation](docs/install.md)**.
 
-> Status: in progress. Written on a Windows dev box; **run/tested on the Linux
-> side**. Expect to iterate.
+## En savoir plus
+
+- 📖 **[Manuel d'utilisation](docs/user-manual.md)** — activités, zones, apps, applets,
+  FM-Song Tracker, raccourcis.
+- 🛠️ **[Guide d'installation](docs/install.md)**.
+- 🧰 **[Détails techniques du shell](docs/desktop.md)** (pour contribuer).
+
+---
+
+> **Statut** : en développement. Le bureau et le tracker tournent sur Raspberry Pi 4
+> (Sway/Wayland). Les retours sont les bienvenus.
