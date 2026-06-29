@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 # Launch the FM-Song Tracker (installed under /usr/local/lib/focusde/apps).
 export PYTHONPATH="/usr/local/lib/focusde/apps:${PYTHONPATH:-}"
+export GTK_A11Y="${GTK_A11Y:-none}"   # no accessibility bus on the headless Pi
 exec python3 -m fmtracker "$@"
