@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Launch the FM-Song Tracker (installed under /usr/local/lib/focusde/apps).
+export PYTHONPATH="/usr/local/lib/focusde/apps:${PYTHONPATH:-}"
+exec python3 -m fmtracker "$@"

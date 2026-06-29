@@ -12,3 +12,7 @@ venv/
 # Local soundfonts / audio dumps (large binaries — install via apt)
 *.sf2
 *.wav
+
+# Built install archive
+focusde-rootfs.tar.gz
+*.tar.gz

@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=FM-Song Tracker
+Comment=MIDI music tracker (fluidsynth)
+Exec=fmtracker
+Terminal=false
+Categories=AudioVideo;Audio;Music;

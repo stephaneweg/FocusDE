@@ -1,10 +1,14 @@
-# These run on Linux — keep LF endings even when checked out on Windows.
-*.sh text eol=lf
-*.py text eol=lf
+* text=auto
 
-# Desktop shell config + data consumed by Linux tools — force LF too.
-desktop/config/** text eol=lf
-*.json text eol=lf
-*.jsonc text eol=lf
-*.ini text eol=lf
-*.css text eol=lf
+# Linux-bound files: keep LF endings even when checked out on Windows.
+*.sh      text eol=lf
+*.py      text eol=lf
+*.json    text eol=lf
+*.jsonc   text eol=lf
+*.ini     text eol=lf
+*.css     text eol=lf
+*.toml    text eol=lf
+*.desktop text eol=lf
+
+# The whole payload tree is consumed on Linux (incl. extension-less files).
+rootfs/** text eol=lf

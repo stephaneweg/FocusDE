@@ -1,0 +1,13 @@
+# greetd — login manager for the Focus DE (Sway) session.
+# After authentication it starts Sway, which loads the Focus DE activity shell.
+# 'agreety' ships with greetd (always available). For a nicer screen install
+# 'tuigreet' and use:  command = "tuigreet --time --remember --cmd sway"
+#
+# Enable with:  sudo systemctl enable greetd   (see scripts/install.sh --login)
+
+[terminal]
+vt = 1
+
+[default_session]
+command = "agreety --cmd sway"
+user = "greeter"
