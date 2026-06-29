@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import threading
 
 import gi
@@ -90,8 +91,9 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
                 g.append(w)
             bar.insert(g, -1)
 
-        group(button("New", self._on_new), button("Open .fms", self._on_open_fms),
-              self._export_button())
+        group(button("New", self._on_new), button("Open", self._on_open_project),
+              button("Save", self._on_save_project),
+              button("Import .fms", self._on_open_fms), self._export_button())
         group(button("▶ Play", self._on_play), button("❚❚ Pause", self._on_pause),
               button("Resume", self._on_resume), button("■ Stop", self._on_stop))
         group(button("+ Channel", self._on_add_channel),
@@ -331,6 +333,60 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
             f"Loaded {path}: {len(song.patterns)} pattern(s), "
             f"{len(song.channels)} channels, BPM {song.bpm:.0f}"
         )
+
+    # -- native project save / open (lossless, .fmtrk JSON) ------------------
+
+    def _on_save_project(self, *_):
+        name = (self.song.title or "song").strip() or "song"
+        dlg = Gtk.FileChooserNative(title="Save project", transient_for=self,
+                                    action=Gtk.FileChooserAction.SAVE)
+        dlg.set_current_name(name + ".fmtrk")
+        dlg.connect("response", self._on_save_response)
+        dlg.show()
+        self._save_dialog = dlg
+
+    def _on_save_response(self, dlg, response):
+        if response == Gtk.ResponseType.ACCEPT:
+            gf = dlg.get_file()
+            if gf:
+                try:
+                    with open(gf.get_path(), "w", encoding="utf-8") as f:
+                        json.dump(self.song.to_dict(), f, ensure_ascii=False, indent=1)
+                    self.status.set_text("Saved: " + gf.get_path())
+                except Exception as exc:                 # noqa: BLE001
+                    self.status.set_text("Save failed: %s" % exc)
+        dlg.destroy()
+        self._save_dialog = None
+
+    def _on_open_project(self, *_):
+        dlg = Gtk.FileChooserNative(title="Open project (.fmtrk)", transient_for=self,
+                                    action=Gtk.FileChooserAction.OPEN)
+        flt = Gtk.FileFilter()
+        flt.set_name("FM-Tracker project")
+        flt.add_pattern("*.fmtrk")
+        dlg.add_filter(flt)
+        dlg.connect("response", self._on_open_project_response)
+        dlg.show()
+        self._open_proj_dialog = dlg
+
+    def _on_open_project_response(self, dlg, response):
+        if response == Gtk.ResponseType.ACCEPT:
+            gf = dlg.get_file()
+            if gf:
+                try:
+                    with open(gf.get_path(), encoding="utf-8") as f:
+                        song = Song.from_dict(json.load(f))
+                    self.seq.stop()
+                    self.song = song
+                    self.grid.set_song(song)
+                    self.bpm_spin.set_value(song.bpm)
+                    self._refresh_patterns()
+                    self._sync_instrument()
+                    self.status.set_text("Opened: " + gf.get_path())
+                except Exception as exc:                 # noqa: BLE001
+                    self.status.set_text("Open failed: %s" % exc)
+        dlg.destroy()
+        self._open_proj_dialog = None
 
     # -- keyboard ------------------------------------------------------------
 

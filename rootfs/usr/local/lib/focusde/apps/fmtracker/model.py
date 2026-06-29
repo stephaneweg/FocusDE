@@ -137,6 +137,9 @@ class Song:
     def to_dict(self):
         return {
             "version": 1,
+            "title": self.title,
+            "author": self.author,
+            "comment": self.comment,
             "bpm": self.bpm,
             "rows_per_beat": self.rows_per_beat,
             "channels": [c.to_dict() for c in self.channels],
@@ -147,6 +150,9 @@ class Song:
     @classmethod
     def from_dict(cls, d):
         song = cls()
+        song.title = d.get("title", "")
+        song.author = d.get("author", "")
+        song.comment = d.get("comment", "")
         song.bpm = d.get("bpm", 120.0)
         song.rows_per_beat = d.get("rows_per_beat", 4)
         song.channels = [Channel.from_dict(c) for c in d["channels"]]
