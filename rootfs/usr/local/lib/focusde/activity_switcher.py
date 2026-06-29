@@ -42,7 +42,8 @@ class Switcher(Gtk.Window):
             b.connect("clicked", self.go, name)
             col.pack_start(b, False, False, 0)
         self.connect("key-press-event", lambda _w, e: Gtk.main_quit() if e.keyval == Gdk.KEY_Escape else None)
-        self.connect("focus-out-event", lambda *_: Gtk.main_quit())
+        # No focus-out close: with sway focus_follows_mouse it would vanish the moment
+        # the pointer moves. Mouse-driven: stays until an activity is clicked (or Escape).
 
     def go(self, _b, name):
         subprocess.run(["swaymsg", "-q", "workspace " + name]); Gtk.main_quit()

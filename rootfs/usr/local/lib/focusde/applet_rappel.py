@@ -75,7 +75,7 @@ class RappelWidget(Gtk.Box):
         b.add(h); b.connect("clicked", lambda _w: self.open_agenda(ev["id"])); return b
 
     def open_agenda(self, eid):
-        subprocess.Popen(["python3", LIBDIR + "/activity.py", "agenda"],
+        subprocess.Popen(["python3", LIBDIR + "/agenda.py"],   # floating window, not a new activity
                          stdin=subprocess.DEVNULL, start_new_session=True)
         cmd = ["python3", LIBDIR + "/event_dialog.py"]
         if eid is not None: cmd += ["--id", str(eid)]
