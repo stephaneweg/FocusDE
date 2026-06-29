@@ -14,11 +14,12 @@ from __future__ import annotations
 
 import os
 import shutil
+import struct
 import subprocess
 import tempfile
 
 from . import synth as synthmod
-from .model import REST, Song
+from .model import REST, Channel, Pattern, Song
 
 PPQ = 480     # MIDI ticks per quarter note
 
@@ -287,6 +288,102 @@ def write_mscx(song: Song, path: str, num: int = 4, den: int = 4) -> str:
     with open(path, "w", encoding="utf-8") as f:
         f.write("\n".join(out) + "\n")
     return path
+
+
+# ----- MIDI import (Standard MIDI File -> Song) --------------------------------------
+
+def _read_vlq_at(data, pos):
+    n = 0
+    while True:
+        b = data[pos]; pos += 1
+        n = (n << 7) | (b & 0x7F)
+        if not (b & 0x80):
+            return n, pos
+
+
+def import_midi(path: str, rows_per_beat: int = 4) -> Song:
+    """Read a Standard MIDI File into a (monophonic-per-channel) Song.
+
+    Polyphony is approximated: on a channel, a new note ends the one before it.
+    """
+    data = open(path, "rb").read()
+    if data[:4] != b"MThd":
+        raise ValueError("not a MIDI file")
+    _fmt, ntrk, div = struct.unpack(">HHH", data[8:14])
+    ppq = div if div > 0 else 480
+    pos = 14
+    tempo = 500000
+    programs = {}
+    notes_by_ch = {}          # ch -> list of (start_tick, end_tick, midi)
+    active = {}               # (ch, midi) -> start_tick
+
+    for _ in range(ntrk):
+        if data[pos:pos + 4] != b"MTrk":
+            break
+        length = struct.unpack(">I", data[pos + 4:pos + 8])[0]
+        pos += 8
+        end = pos + length
+        t = 0
+        status = 0
+        while pos < end:
+            delta, pos = _read_vlq_at(data, pos)
+            t += delta
+            b = data[pos]
+            if b & 0x80:
+                status = b; pos += 1
+            ev, ch = status & 0xF0, status & 0x0F
+            if ev in (0x80, 0x90, 0xA0, 0xB0, 0xE0):
+                d1 = data[pos]; d2 = data[pos + 1]; pos += 2
+                if ev == 0x90 and d2 > 0:
+                    key = (ch, d1)
+                    if key in active:
+                        notes_by_ch.setdefault(ch, []).append((active[key], t, d1))
+                    active[key] = t
+                elif ev == 0x80 or (ev == 0x90 and d2 == 0):
+                    key = (ch, d1)
+                    if key in active:
+                        notes_by_ch.setdefault(ch, []).append((active.pop(key), t, d1))
+            elif ev in (0xC0, 0xD0):
+                d1 = data[pos]; pos += 1
+                if ev == 0xC0:
+                    programs[ch] = d1
+            elif status == 0xFF:
+                meta = data[pos]; pos += 1
+                mlen, pos = _read_vlq_at(data, pos)
+                if meta == 0x51 and mlen == 3:
+                    tempo = int.from_bytes(data[pos:pos + 3], "big")
+                pos += mlen
+            elif status in (0xF0, 0xF7):
+                mlen, pos = _read_vlq_at(data, pos)
+                pos += mlen
+            else:
+                pos += 1
+        pos = end
+
+    song = Song()
+    song.rows_per_beat = rows_per_beat
+    song.bpm = max(20.0, min(400.0, 60_000_000.0 / max(1, tempo)))
+    tpr = max(1, ppq // rows_per_beat)
+    max_tick = max((e for evs in notes_by_ch.values() for (_s, e, _n) in evs), default=0)
+    rows = max(1, (max_tick + tpr - 1) // tpr + 1)
+
+    chans = sorted(notes_by_ch.keys())
+    pat = Pattern("Pattern 1", rows, len(chans))
+    for ci, ch in enumerate(chans):
+        song.channels.append(Channel("Ch %d" % (ci + 1), midi_channel=ch,
+                                      program=programs.get(ch, 0)))
+        for (s, e, n) in sorted(notes_by_ch[ch]):
+            sr = min(rows - 1, round(s / tpr))
+            er = min(rows - 1, round(e / tpr))
+            pat.data[ci][sr] = n
+            if er > sr and pat.data[ci][er] is None:
+                pat.data[ci][er] = REST
+    if not song.channels:                 # empty/percussion-only file -> one empty channel
+        song.channels.append(Channel("Ch 1", 0, 0))
+        pat = Pattern("Pattern 1", rows, 1)
+    song.patterns.append(pat)
+    song.order = [0]
+    return song
 
 
 def export(song: Song, path: str, fmt: str) -> str:

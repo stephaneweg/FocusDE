@@ -93,7 +93,8 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
 
         group(button("New", self._on_new), button("Open", self._on_open_project),
               button("Save", self._on_save_project),
-              button("Import .fms", self._on_open_fms), self._export_button())
+              button("Import .fms", self._on_open_fms),
+              button("Import MIDI", self._on_import_midi), self._export_button())
         group(button("▶ Play", self._on_play), button("❚❚ Pause", self._on_pause),
               button("Resume", self._on_resume), button("■ Stop", self._on_stop))
         group(button("+ Channel", self._on_add_channel),
@@ -333,6 +334,38 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
             f"Loaded {path}: {len(song.patterns)} pattern(s), "
             f"{len(song.channels)} channels, BPM {song.bpm:.0f}"
         )
+
+    def _on_import_midi(self, *_):
+        dlg = Gtk.FileChooserNative(title="Import MIDI (.mid)", transient_for=self,
+                                    action=Gtk.FileChooserAction.OPEN)
+        flt = Gtk.FileFilter()
+        flt.set_name("MIDI files")
+        flt.add_pattern("*.mid")
+        flt.add_pattern("*.midi")
+        dlg.add_filter(flt)
+        dlg.connect("response", self._on_import_midi_response)
+        dlg.show()
+        self._midi_dialog = dlg
+
+    def _on_import_midi_response(self, dlg, response):
+        if response == Gtk.ResponseType.ACCEPT:
+            gf = dlg.get_file()
+            if gf:
+                try:
+                    song = export.import_midi(gf.get_path())
+                    self.seq.stop()
+                    self.song = song
+                    self.grid.set_song(song)
+                    self.bpm_spin.set_value(song.bpm)
+                    self._refresh_patterns()
+                    self._sync_instrument()
+                    self.status.set_text(
+                        "Imported MIDI: %d channels, BPM %.0f"
+                        % (len(song.channels), song.bpm))
+                except Exception as exc:                 # noqa: BLE001
+                    self.status.set_text("MIDI import failed: %s" % exc)
+        dlg.destroy()
+        self._midi_dialog = None
 
     # -- native project save / open (lossless, .fmtrk JSON) ------------------
 
