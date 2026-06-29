@@ -10,8 +10,9 @@ users (including users created later).
 - **root** access (`sudo`) and an internet connection (for dependencies).
 
 Dependencies are pulled automatically: Sway, waybar, fuzzel, foot, greetd, Python 3 +
-PyGObject (GTK 3 and 4) + Cairo, fluidsynth + a General-MIDI SoundFont, plus AbiWord,
-Gnumeric and Firefox for the hosted applications.
+PyGObject (GTK 3 and 4) + Cairo, fluidsynth + a General-MIDI SoundFont, ffmpeg (for the
+tracker's MP3 export), plus AbiWord, Gnumeric and Firefox for the hosted applications.
+(MuseScore export is native `.mscx` — MuseScore itself is not required.)
 
 ## Install
 

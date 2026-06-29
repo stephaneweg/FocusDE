@@ -41,11 +41,12 @@ collections in `…/.config/focus/hubs/*.list`; `…/.config/fuzzel/fuzzel.ini`.
 
 **Applets** — framework: `applet.py`, `applet_mgr.py`, `focus_applets.py`,
 `panel_host.py`, `panel_toggle.py`; applets: `applet_clock.py`, `applet_calc.py`,
-`applet_music.py`, `applet_notes.py`, `applet_rappel.py`; per-activity layout in
-`…/.config/focus/applets/*`.
+`applet_music.py`, `applet_notes.py`, `applet_rappel.py`, `applet_fmplayer.py` (plays
+`.fms` via the fmtracker engine); per-activity layout in `…/.config/focus/applets/*`.
 
 **Theme** — `theme.py`, `theme_apply.py`, `theme_daemon.py`, `focus_theme.py`
-(`$mod+Shift+t`); definitions in `…/.config/focus/{theme,themes/{Vert,Bleu}}`.
+(`$mod+Shift+t`); palettes are built into `focus_theme.py`, per-activity choices in
+`…/.config/focus/{theme,themes/*}`.
 
 **Agenda / notes** — `agenda.py`, `event_dialog.py`, `note_dialog.py`.
 
@@ -55,6 +56,9 @@ collections in `…/.config/focus/hubs/*.list`; `…/.config/fuzzel/fuzzel.ini`.
 **Boot / helpers** — `focus_boot.sh` (session boot), `go_home.sh`, `add_app.sh`,
 `setup_autostart.sh` (a no-display-manager fallback that execs Sway on tty1).
 
-> The `fmtracker` app
+> The **fmtracker** app
 > ([`rootfs/usr/local/lib/focusde/apps/fmtracker/`](../rootfs/usr/local/lib/focusde/apps/fmtracker/))
-> is one of the applications hosted inside these activities.
+> is a hosted application AND a reusable, GTK-free engine: `model.py`, `fms.py` (legacy
+> `.fms` import), `synth.py` (libfluidsynth via ctypes), `sequencer.py`, plus `export.py`
+> (MIDI/WAV/MP3 + native MuseScore `.mscx`) and MIDI import; `gridview.py` + `app.py` are
+> the GTK4 UI. The FM-Player applet reuses that engine from the GTK3 shell.

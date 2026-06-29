@@ -63,8 +63,9 @@ The Home is your starting point (click **Accueil** in the bar at any time). It s
 **Create an activity**: click the **+ Nouvelle activité** tile and give it a name. It
 opens empty, ready to be filled with applications.
 
-**Switch activities**: click its tile from the Home. (Under the hood each activity is
-a Sway workspace; `Super`+`1`…`9` also works.)
+**Switch activities**: click its tile from the Home, or click the **activity name on
+the left of the top bar** to open a quick switcher and pick another one. (Under the
+hood each activity is a Sway workspace; `Super`+`1`…`9` also works.)
 
 ---
 
@@ -142,7 +143,7 @@ The left panel hosts **applets**. Click the **+** at the top of the panel
 | **Calculatrice** (Calculator) | Quick sums | calculations without leaving the activity |
 | **Musique** (Music) | Plays files from `~/Music` | listen to your music (MP3/OGG/FLAC…) |
 | **FM-Player** | Plays FM-Song `.fms` tunes | a single file or a whole folder — see below |
-| **Rappel** (Reminder) | Upcoming agenda events | a glance at your agenda |
+| **Rappel** (Reminder) | Upcoming agenda events | click an event or **+ RDV** to open the **Agenda** in a floating window (with a **Fermer** button) |
 
 The **Panneau** button in the bar shows/hides the panel.
 
@@ -172,7 +173,12 @@ instrument bank — hundreds of instruments available. It also imports the origi
 FM-Song **`.fms`** tunes.
 
 **Launch**: from the **Créer** hub, via **+ App**, or on the command line
-`fmtracker my_tune.fms`. The **Open .fms** button opens an existing tune.
+`fmtracker my_tune.fms`.
+
+**Files** (toolbar): **New** starts an empty song; **Save** / **Open** store and reload
+your work as a lossless **`.fmtrk`** project (use this to resume later); **Import .fms**
+opens a legacy FM-Song tune; **Import MIDI** loads a `.mid`. (The exports below are final
+renders, not re-editable projects.)
 
 **Reading the grid**: each **column** is a channel (an instrument); each **row** is a
 step (time runs downward).
