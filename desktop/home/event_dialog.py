@@ -2,7 +2,7 @@
 # Onyx / Focus DE - dialogue flottant : creer / modifier / supprimer un rendez-vous.
 # usage: event_dialog.py [--id <n>] [--date YYYY-MM-DD]
 import gi, sys, datetime
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk

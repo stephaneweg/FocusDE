@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Onyx - sélecteur d'apps à la souris : choisir la zone + cliquer une app -> ajoutée à la zone.
 import gi, subprocess, json, os, glob, re, sys
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -128,7 +128,7 @@ class Picker(Gtk.Window):
             with open(f, "a", encoding="utf-8") as fh:
                 fh.write("%s\t%s\t%s\n" % (a["name"], a["cmd"], a["icon"]))
         else:
-            subprocess.Popen(["python3", "/home/maison/activity.py", "add", self.zone] + a["cmd"].split())
+            subprocess.Popen(["python3", os.path.join(os.path.dirname(os.path.realpath(__file__)), "activity.py"), "add", self.zone] + a["cmd"].split())
         Gtk.main_quit()
 
     def fill(self):

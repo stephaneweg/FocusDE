@@ -2,7 +2,7 @@
 # Onyx / Focus DE - registre des VRAIS applets du panneau gauche.
 # Le gestionnaire d'applets (applet_mgr.py) ne propose que ceux-ci.
 import os, json, re
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 CONF = os.path.expanduser("~/.config/onyx")
 
 # Chaque applet est un module exposant make(ctx)->Gtk.Box, CSS (str), EXPAND (bool).

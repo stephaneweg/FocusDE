@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Onyx - applique la palette de l'activite au changement de workspace (fluide, sans redemarrage).
 import sys, subprocess, json
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme
 
 _last = [None]

@@ -5,7 +5,7 @@ import gi, subprocess, os, glob, re, sys
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 GLib.set_prgname("onyx-hub")
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 sys.path.insert(0, HOME)
 import onyx_theme
 

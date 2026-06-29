@@ -2,11 +2,11 @@
 # Onyx / Focus DE - applet Notes (widget embarquable). Notes contextuelles a l'activite ;
 # scope "__global__" depuis l'accueil. oeil = voir/editer, croix = supprimer, + Nouvelle.
 import gi, os, subprocess, sys
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 
 EXPAND = True
 CSS = """

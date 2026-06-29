@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Onyx / Focus DE - applet Musique (widget embarquable, lecteur GStreamer, lit ~/Music).
 import gi, os, sys
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme
 gi.require_version("Gtk", "3.0"); gi.require_version("Gst", "1.0")
 from gi.repository import Gtk, GLib, Gdk, Gst

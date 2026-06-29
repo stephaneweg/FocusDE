@@ -3,7 +3,7 @@
 #                --swayonly                  -> boot : re-applique la palette courante a sway
 #                --activity <nom> <Palette>  -> override pour une activite (persiste + applique)
 import sys, os, subprocess, time, json
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme
 CONF = os.path.expanduser("~/.config/onyx")
 
@@ -40,7 +40,7 @@ onyx_theme.apply_sway(pal); onyx_theme.write_waybar(pal); onyx_theme.reload_wayb
 cur = focused()
 sw("workspace Accueil")
 sw("[app_id=onyx-home] kill"); sw("[app_id=onyx-applet] kill"); time.sleep(1)
-subprocess.run(["python3", "/home/maison/activity.py", "home"]); time.sleep(1)
+subprocess.run(["python3", os.path.join(os.path.dirname(os.path.realpath(__file__)), "activity.py"), "home"]); time.sleep(1)
 if cur and cur != "Accueil":
     sw("workspace " + cur)
 print("global -> %s" % pal)

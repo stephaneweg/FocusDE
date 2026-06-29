@@ -2,7 +2,7 @@
 # Onyx activity manager v2 : construction fiable, marques par-activite, accueil.
 import subprocess, json, time, os, sys
 DN = subprocess.DEVNULL
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 sys.path.insert(0, HOME)
 import onyx_applets
 

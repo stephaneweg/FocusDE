@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Onyx - accueil (design facon mockup) : en-tete + cartes + grandes tuiles d'activites.
 import gi, subprocess, json, os, time, datetime, getpass, sys
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -148,7 +148,7 @@ class Home(Gtk.Window):
         v.pack_start(nm, False, False, 0)
         b.add(v)
         b.connect("clicked", lambda _w, n=name:
-                  subprocess.Popen(["python3", "/home/maison/activity.py", "hub", n]))
+                  subprocess.Popen(["python3", os.path.join(os.path.dirname(os.path.realpath(__file__)), "activity.py"), "hub", n]))
         return b
 
     def newtile(self):
@@ -171,7 +171,7 @@ class Home(Gtk.Window):
         ca.pack_start(e, True, True, 0); d.show_all()
         if d.run() == Gtk.ResponseType.OK:
             name = e.get_text().strip() or "Activité"
-            subprocess.Popen(["python3", "/home/maison/activity.py", "new", "--auto", name])
+            subprocess.Popen(["python3", os.path.join(os.path.dirname(os.path.realpath(__file__)), "activity.py"), "new", "--auto", name])
         d.destroy()
 
     def parents(self, _w):

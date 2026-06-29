@@ -7,20 +7,32 @@ a home/hub launcher, applets, and a theme system.
 This is a snapshot of the working tree as it lives on the Pi. Personal runtime
 data (notes, agenda contents) is intentionally **not** included.
 
-## Deploy mapping
+## Install model — default desktop for every user
 
-The two subfolders mirror where the files live on the Pi:
+The shell installs **once, system-wide**, and becomes the default for every user
+(including users created later) via `/etc/skel`:
 
-| Repo | On the Pi |
-|------|-----------|
-| `desktop/home/`   | `~` (i.e. `/home/maison/`) |
-| `desktop/config/` | `~/.config/` |
+| Repo | Installs to | Role |
+|------|-------------|------|
+| `desktop/home/`   | `/usr/local/lib/focusde/` | shared **code** (Python + shell logic), read-only |
+| `desktop/config/` | `/etc/skel/.config/` + each user's `~/.config/` | per-user **config** (sway, waybar, onyx, fuzzel) |
+
+The Python scripts locate themselves (`os.path.realpath(__file__)`), so the code
+is relocatable; per-user data (notes, agenda, chosen theme) is read/written under
+the real `$HOME`. The config references the code by its install path
+(`/usr/local/lib/focusde/`) and per-user button scripts via `$HOME`.
 
 ```sh
-# from this folder, on the Pi (or over rsync from a checkout):
-rsync -a home/   /home/maison/
-rsync -a config/ /home/maison/.config/
+sudo ./scripts/install-desktop.sh              # code + /etc/skel + current user
+sudo ./scripts/install-desktop.sh --autostart  # also start sway on tty1 at boot
+sudo ./scripts/install-desktop.sh someuser     # also seed an existing user
 ```
+
+Because the defaults live in `/etc/skel/.config`, any user created afterwards
+(`adduser …`) automatically gets the Focus DE desktop.
+
+> Prerequisites (install separately): `sway waybar fuzzel foot python3-gi
+> gir1.2-gtk-3.0 abiword gnumeric firefox-esr`.
 
 ## What's here
 

@@ -2,12 +2,12 @@
 # Onyx / Focus DE - gestionnaire d'applets : cocher les VRAIS applets du panneau gauche.
 # "Appliquer" enregistre la selection et reconstruit le panneau (une fenetre panel_host).
 import gi, subprocess, json, sys
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 GLib.set_prgname("onyx-applets")
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 
 def focused():
     try:

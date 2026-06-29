@@ -2,11 +2,11 @@
 # Onyx / Focus DE - applet Rappel (widget embarquable) : prochains rendez-vous.
 # Clic sur un RDV / "+ RDV" -> ouvre l'agenda (zone principale) + le dialogue.
 import gi, os, subprocess, sys
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 
 EXPAND = True
 CSS = """

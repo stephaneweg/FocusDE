@@ -2,12 +2,12 @@
 # Onyx / Focus DE - hote du panneau gauche : UNE fenetre qui empile les applets choisis
 # comme des widgets GTK (hauteur naturelle adaptative, pas de bordure, un seul scroll).
 import gi, importlib, subprocess, sys
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 GLib.set_prgname("onyx-panel")
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 
 BASE_CSS = """
 window { background: @bg@; }

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # Onyx - selecteur de theme : echantillons de palettes, clic = applique.
 import gi, subprocess, sys, json
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 GLib.set_prgname("onyx-theme")
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 
 def focused_ws():
     try:

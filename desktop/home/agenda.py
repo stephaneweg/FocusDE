@@ -2,12 +2,12 @@
 # Onyx / Focus DE - app Agenda (zone principale). Vue Liste + vue Mois (calendrier).
 # Clic sur un rdv = modifier ; "+ Nouveau" = creer ; double-clic sur un jour = creer ce jour-la.
 import gi, os, subprocess, sys, datetime
-sys.path.insert(0, "/home/maison")
+import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 GLib.set_prgname("onyx-agenda")
-HOME = "/home/maison"
+import os; HOME = os.path.expanduser("~")
 
 CSS = """
 window { background: @bg@; }
