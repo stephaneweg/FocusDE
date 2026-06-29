@@ -127,9 +127,47 @@ def has_app(app_id):
         return False
     t = get("get_tree"); return bool(t and scan(t))
 
+def reap_stale_panels(ws_id, keep=None):
+    # Tue les hotes de panneau ORPHELINS sur le workspace ws_id : un focus-panel dont
+    # la marque n'est pas Zl_<ws_id> (residu d'un build precedent ou Accueil avait un
+    # autre id -- la reconstruction au boot empile les panneaux). Garde celui qui matche
+    # (et `keep` si fourni). Renvoie la liste des con_id tues.
+    tree = get("get_tree")
+    if not tree:
+        return []
+    def find_ws(n):
+        if n.get("type") == "workspace" and n.get("id") == ws_id:
+            return n
+        for c in (n.get("nodes") or []) + (n.get("floating_nodes") or []):
+            r = find_ws(c)
+            if r:
+                return r
+        return None
+    wsn = find_ws(tree)
+    if not wsn:
+        return []
+    good = "Zl_%d" % ws_id
+    victims = []
+    def scan(n):
+        if n.get("app_id") == "focus-panel" and n.get("id") != keep and good not in (n.get("marks") or []):
+            victims.append(n["id"])
+        for c in (n.get("nodes") or []) + (n.get("floating_nodes") or []):
+            scan(c)
+    scan(wsn)
+    for cid in victims:
+        sw("[con_id=%d] kill" % cid)
+    if victims:
+        time.sleep(0.3)
+        print("reaped %d stale panel(s) on ws %d: %s" % (len(victims), ws_id, victims))
+    return victims
+
 def build_home():
-    if has_app("focus-home"):          # already built -> idempotent, just go there
-        sw("workspace Accueil"); return
+    if has_app("focus-home"):          # already built -> idempotent, just go there + nettoyage
+        sw("workspace Accueil"); time.sleep(0.2)
+        ws = focused_ws()
+        if ws:
+            reap_stale_panels(ws["id"])   # tuer un panneau orphelin survivant (cause du doublon)
+        return
     sw('[app_id="focus-panel"] kill'); time.sleep(0.3)   # clear any stray half-built panel
     names = [w.get("name") for w in (get("get_workspaces") or [])]
     if "Accueil" in names:
@@ -145,7 +183,9 @@ def build_home():
     sw("[con_id=%d] focus" % L); sw("resize set width 240 px")
     # marquer le panneau (comme une activite) pour que "+ Applet" le remplace au lieu d'en creer un 2e
     ws = focused_ws()
-    if ws: sw("[con_id=%d] mark Zl_%d" % (L, ws["id"]))
+    if ws:
+        sw("[con_id=%d] mark Zl_%d" % (L, ws["id"]))
+        reap_stale_panels(ws["id"], keep=L)   # tuer tout autre panneau laisse sur l'Accueil
     print("home built L=%s M=%s" % (L, M))
 
 def hub(category):
