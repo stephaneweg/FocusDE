@@ -118,7 +118,18 @@ def add(zone, cmd):
     sw("[con_id=%d] focus" % cid)
     return 0
 
+def has_app(app_id):
+    def scan(n):
+        if n.get("app_id") == app_id: return True
+        for c in (n.get("nodes") or []) + (n.get("floating_nodes") or []):
+            if scan(c): return True
+        return False
+    t = get("get_tree"); return bool(t and scan(t))
+
 def build_home():
+    if has_app("onyx-home"):          # already built -> idempotent, just go there
+        sw("workspace Accueil"); return
+    sw('[app_id="onyx-panel"] kill'); time.sleep(0.3)   # clear any stray half-built panel
     names = [w.get("name") for w in (get("get_workspaces") or [])]
     if "Accueil" in names:
         sw("workspace Accueil")

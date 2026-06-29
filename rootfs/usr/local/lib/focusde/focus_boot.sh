@@ -6,10 +6,13 @@ for i in $(seq 1 40); do
   swaymsg -t get_version >/dev/null 2>&1 && break
   sleep 0.5
 done
-for i in 1 2 3; do
-  if [ "$(swaymsg -t get_tree 2>/dev/null | grep -c onyx-home)" -ge 1 ]; then
-    break
-  fi
+for attempt in 1 2 3; do
+  swaymsg -t get_tree 2>/dev/null | grep -q onyx-home && break
   python3 "$DIR/activity.py" home
-  sleep 3
+  # wait (up to ~12s) for the home to actually appear before retrying — a slow
+  # headless Pi can take several seconds, and retrying early stacks panels.
+  for j in $(seq 1 24); do
+    swaymsg -t get_tree 2>/dev/null | grep -q onyx-home && break
+    sleep 0.5
+  done
 done
