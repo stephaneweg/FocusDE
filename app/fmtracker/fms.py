@@ -117,20 +117,34 @@ def parse_fms(data: bytes) -> Song:
         )
 
     first_delay = None
-    for _t in range(maxtrack):
-        mnotes = r.i16()
-        delay = r.i16()
-        if first_delay is None and delay > 0:
-            first_delay = delay
-        r.take(8)                                   # channel-enabled flags (unused)
-        if mnotes < 0 or mnotes > 100000:
-            raise FmsError(f"implausible note count: {mnotes}")
+    try:
+        for _t in range(maxtrack):
+            mnotes = r.i16()
+            delay = r.i16()
+            if first_delay is None and delay > 0:
+                first_delay = delay
+            r.take(8)                               # channel-enabled flags (unused)
+            if mnotes < 0 or mnotes > 100000:
+                raise FmsError(f"implausible note count: {mnotes}")
 
-        pat = Pattern(f"Pattern {_t + 1}", mnotes, len(song.channels))
-        for ch in range(8):
-            for row in range(mnotes):
-                pat.data[ch][row] = _decode_note(r.u8())
-        song.patterns.append(pat)
+            pat = Pattern(f"Pattern {_t + 1}", mnotes, len(song.channels))
+            truncated = False
+            for ch in range(8):
+                for row in range(mnotes):
+                    try:
+                        pat.data[ch][row] = _decode_note(r.u8())
+                    except FmsError:
+                        truncated = True       # leave the rest empty (None)
+                        break
+                if truncated:
+                    break
+            song.patterns.append(pat)
+            if truncated:
+                break
+    except FmsError:
+        # Truncated file: keep the complete tracks parsed so far.
+        if not song.patterns:
+            raise
 
     song.order = list(range(len(song.patterns)))
 
