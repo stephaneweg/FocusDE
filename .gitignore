@@ -13,6 +13,7 @@ venv/
 *.sf2
 *.wav
 
-# Built install archive
+# Built install artifacts
 focusde-rootfs.tar.gz
 *.tar.gz
+*.deb

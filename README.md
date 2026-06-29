@@ -40,6 +40,16 @@ sudo ./scripts/install.sh --login        # lay payload onto /, seed current user
 sudo tar -C / -xzf focusde-rootfs.tar.gz # extracts every file to its place under /
 ```
 
+…or build a Debian package (`Architecture: all`, works on the Pi's arm64):
+
+```sh
+./scripts/build-deb.sh 0.1.0             # -> focusde_0.1.0_all.deb
+sudo apt install ./focusde_0.1.0_all.deb # pulls in sway/waybar/greetd/fluidsynth/…
+```
+
+CI builds the `.deb` automatically (see `.github/workflows/build-deb.yml`) on a
+`v*` tag or manual dispatch, and uploads it as an artifact. (RPM packaging: later.)
+
 ### Login manager (boot straight into the desktop)
 
 The Pi boots into **greetd**, the lightweight login manager for wlroots/Sway. Its

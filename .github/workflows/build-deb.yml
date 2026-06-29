@@ -1,0 +1,33 @@
+name: build-deb
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Package version"
+        default: "0.1.0"
+
+jobs:
+  deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Determine version
+        id: ver
+        run: |
+          if [ -n "${{ github.event.inputs.version }}" ]; then
+            echo "v=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            T="${GITHUB_REF_NAME#v}"
+            echo "v=${T:-0.1.0}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Build .deb
+        run: bash scripts/build-deb.sh "${{ steps.ver.outputs.v }}"
+      - name: Lint package
+        run: dpkg-deb --info focusde_*.deb && dpkg-deb --contents focusde_*.deb | head
+      - uses: actions/upload-artifact@v4
+        with:
+          name: focusde-deb
+          path: "*.deb"

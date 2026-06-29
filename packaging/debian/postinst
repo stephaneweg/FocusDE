@@ -1,0 +1,19 @@
+#!/bin/sh
+set -e
+
+# Ensure executables are runnable.
+chmod 755 /usr/local/bin/fmtracker /usr/local/lib/focusde/*.sh 2>/dev/null || true
+
+# Refresh the application menu.
+if command -v update-desktop-database >/dev/null 2>&1; then
+    update-desktop-database -q /usr/share/applications 2>/dev/null || true
+fi
+
+cat <<'EOF'
+Focus DE installed.
+  - New users get the desktop automatically (defaults live in /etc/skel/.config).
+  - To seed an existing user:  cp -a /etc/skel/.config/. ~/.config/
+  - To boot into a login that starts Sway:  sudo systemctl enable greetd
+EOF
+
+exit 0

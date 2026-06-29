@@ -12,3 +12,7 @@
 
 # The whole payload tree is consumed on Linux (incl. extension-less files).
 rootfs/** text eol=lf
+
+# Packaging + CI run on Linux too (control/postinst have no extension).
+packaging/** text eol=lf
+*.yml text eol=lf
