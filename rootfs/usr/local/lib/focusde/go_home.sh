@@ -7,7 +7,7 @@ export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
 export GDK_BACKEND=wayland
 export SWAYSOCK="${SWAYSOCK:-$(ls "$RUN"/sway-ipc.*.sock 2>/dev/null | head -1)}"
 swaymsg workspace Accueil
-if ! swaymsg -t get_tree | grep -q '"app_id": "onyx-home"'; then
-  swaymsg '[app_id=onyx-applet] kill' 2>/dev/null
+if ! swaymsg -t get_tree | grep -q '"app_id": "focus-home"'; then
+  swaymsg '[app_id=focus-applet] kill' 2>/dev/null
   python3 "$DIR/activity.py" home
 fi

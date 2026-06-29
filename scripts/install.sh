@@ -26,7 +26,7 @@ if [ -n "$USER_HOME" ] && [ -d "$USER_HOME" ]; then
     echo "==> Seeding config for current user '$USER_NAME' -> $USER_HOME/.config"
     mkdir -p "$USER_HOME/.config"
     cp -a /etc/skel/.config/. "$USER_HOME/.config/"
-    for sub in sway waybar onyx fuzzel; do
+    for sub in sway waybar focus fuzzel; do
         [ -e "$USER_HOME/.config/$sub" ] && chown -R "$USER_NAME":"$USER_NAME" "$USER_HOME/.config/$sub"
     done
 fi

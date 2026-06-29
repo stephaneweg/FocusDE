@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Onyx - palettes partagees + theme courant / par activite.
+# Focus DE - palettes partagees + theme courant / par activite.
 import os, re, subprocess
-CONF = os.path.expanduser("~/.config/onyx")
+CONF = os.path.expanduser("~/.config/focus")
 
 PALETTES = {
     "Lavande": dict(bg="#F3F1FA", surface="#FFFFFF", ink="#2C2A38", ink_soft="#8A86A0",

@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - app Agenda (zone principale). Vue Liste + vue Mois (calendrier).
+# Focus DE - app Agenda (zone principale). Vue Liste + vue Mois (calendrier).
 # Clic sur un rdv = modifier ; "+ Nouveau" = creer ; double-clic sur un jour = creer ce jour-la.
 import gi, os, subprocess, sys, datetime
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 LIBDIR = os.path.dirname(os.path.realpath(__file__))
-import onyx_theme, onyx_applets
+import focus_theme, focus_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-agenda")
+GLib.set_prgname("focus-agenda")
 import os; HOME = os.path.expanduser("~")
 
 CSS = """
@@ -79,19 +79,19 @@ class Agenda(Gtk.Window):
         y, mo, da = self.cal.get_date(); return "%04d-%02d-%02d" % (y, mo + 1, da)
 
     def poll(self):
-        try: m = os.path.getmtime(onyx_applets.AGENDA_PATH)
+        try: m = os.path.getmtime(focus_applets.AGENDA_PATH)
         except OSError: m = 0
         if m != self._mtime: self.refresh()
         return True
 
     def refresh(self):
-        try: self._mtime = os.path.getmtime(onyx_applets.AGENDA_PATH)
+        try: self._mtime = os.path.getmtime(focus_applets.AGENDA_PATH)
         except OSError: self._mtime = 0
         self.fill_list(); self.remark(); self.show_day()
 
     def fill_list(self):
         for c in self.list.get_children(): self.list.remove(c)
-        events = onyx_applets.upcoming_events()
+        events = focus_applets.upcoming_events()
         if not events:
             e = Gtk.Label(label="Aucun rendez-vous à venir.\nCliquez « + Nouveau »."); e.set_xalign(0)
             e.get_style_context().add_class("empty"); e.set_line_wrap(True)
@@ -100,7 +100,7 @@ class Agenda(Gtk.Window):
         for ev in events:
             if ev["date"] != cur:
                 cur = ev["date"]
-                d = Gtk.Label(label=onyx_applets.fr_date(cur)); d.set_xalign(0)
+                d = Gtk.Label(label=focus_applets.fr_date(cur)); d.set_xalign(0)
                 d.get_style_context().add_class("day"); self.list.pack_start(d, False, False, 0)
             self.list.pack_start(self.row(ev), False, False, 0)
         self.list.show_all()
@@ -108,16 +108,16 @@ class Agenda(Gtk.Window):
     def remark(self):
         self.cal.clear_marks()
         y, mo, _ = self.cal.get_date()
-        for e in onyx_applets.load_events():
+        for e in focus_applets.load_events():
             try: d = datetime.date.fromisoformat(e["date"])
             except Exception: continue
             if d.year == y and d.month == mo + 1: self.cal.mark_day(d.day)
 
     def show_day(self):
         date = self.sel_date()
-        self.daylbl.set_text(onyx_applets.fr_date(date))
+        self.daylbl.set_text(focus_applets.fr_date(date))
         for c in self.daylist.get_children(): self.daylist.remove(c)
-        evs = [e for e in onyx_applets.load_events() if e.get("date") == date]
+        evs = [e for e in focus_applets.load_events() if e.get("date") == date]
         evs.sort(key=lambda e: e.get("time", ""))
         if not evs:
             e = Gtk.Label(label="Rien ce jour. Double-cliquez le jour pour ajouter.")
@@ -147,7 +147,7 @@ class Agenda(Gtk.Window):
         if date is not None: cmd += ["--date", date]
         subprocess.Popen(cmd, stdin=subprocess.DEVNULL, start_new_session=True)
 
-pal = onyx_theme.for_activity(onyx_theme.focused_ws_name())
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS, pal))
+pal = focus_theme.for_activity(focus_theme.focused_ws_name())
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = Agenda(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

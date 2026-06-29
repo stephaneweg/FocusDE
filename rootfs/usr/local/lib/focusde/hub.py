@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-# Onyx - hub d'activite : grille d'apps. Mode categorie (Travailler...) ou --custom <activite>
-# (raccourcis stockes dans ~/.config/onyx/hubs/<slug>.list : lignes "name\tcmd\ticon").
+# Focus DE - hub d'activite : grille d'apps. Mode categorie (Travailler...) ou --custom <activite>
+# (raccourcis stockes dans ~/.config/focus/hubs/<slug>.list : lignes "name\tcmd\ticon").
 import gi, subprocess, os, glob, re, sys
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-hub")
+GLib.set_prgname("focus-hub")
 import os; HOME = os.path.expanduser("~")
 LIBDIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, LIBDIR)
-import onyx_theme
+import focus_theme
 
 CATMAP = {
     "Travailler": ["Office", "Finance", "WordProcessor", "Spreadsheet"],
@@ -26,7 +26,7 @@ CATMAP = {
 CATEXCLUDE = {"Créer": {"Viewer", "Player"}}
 
 def slug(name): return re.sub(r'[^a-zA-Z0-9]+', '_', name).strip('_') or "act"
-def hub_file(name): return os.path.expanduser("~/.config/onyx/hubs/%s.list" % slug(name))
+def hub_file(name): return os.path.expanduser("~/.config/focus/hubs/%s.list" % slug(name))
 
 def parse(path):
     name = ex = icon = None; nod = False; cats = ""
@@ -132,11 +132,11 @@ class Hub(Gtk.Window):
 
 args = sys.argv[1:]
 if args and args[0] == "--custom":
-    cname = " ".join(args[1:]) or "Activité"; pal = onyx_theme.for_activity(cname)
+    cname = " ".join(args[1:]) or "Activité"; pal = focus_theme.for_activity(cname)
     w = Hub(None, custom_name=cname)
 else:
-    cname = args[0] if args else "Travailler"; pal = onyx_theme.current()
+    cname = args[0] if args else "Travailler"; pal = focus_theme.current()
     w = Hub(cname)
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS, pal))
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

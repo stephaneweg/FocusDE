@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - applet Notes (widget embarquable). Notes contextuelles a l'activite ;
+# Focus DE - applet Notes (widget embarquable). Notes contextuelles a l'activite ;
 # scope "__global__" depuis l'accueil. oeil = voir/editer, croix = supprimer, + Nouvelle.
 import gi, os, subprocess, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 LIBDIR = os.path.dirname(os.path.realpath(__file__))
-import onyx_theme, onyx_applets
+import focus_theme, focus_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 import os; HOME = os.path.expanduser("~")
@@ -24,14 +24,14 @@ CSS = """
 class NotesWidget(Gtk.Box):
     def __init__(self, ctx=None):
         super().__init__(orientation=Gtk.Orientation.VERTICAL)
-        self.scope = (ctx or {}).get("scope") or onyx_applets.notes_scope(onyx_theme.focused_ws_name())
+        self.scope = (ctx or {}).get("scope") or focus_applets.notes_scope(focus_theme.focused_ws_name())
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         card.get_style_context().add_class("notes-card")
         self.pack_start(card, True, True, 0)
         head = Gtk.Box(spacing=6)
         tt = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         h = Gtk.Label(label="Notes"); h.set_xalign(0); h.get_style_context().add_class("notes-head")
-        sc = Gtk.Label(label=onyx_applets.scope_label(self.scope)); sc.set_xalign(0)
+        sc = Gtk.Label(label=focus_applets.scope_label(self.scope)); sc.set_xalign(0)
         sc.get_style_context().add_class("notes-scope")
         tt.pack_start(h, False, False, 0); tt.pack_start(sc, False, False, 0)
         head.pack_start(tt, True, True, 0)
@@ -47,16 +47,16 @@ class NotesWidget(Gtk.Box):
         self.refresh(); GLib.timeout_add(1200, self.poll)
 
     def poll(self):
-        try: m = os.path.getmtime(onyx_applets.notes_path(self.scope))
+        try: m = os.path.getmtime(focus_applets.notes_path(self.scope))
         except OSError: m = 0
         if m != self._mtime: self.refresh()
         return True
 
     def refresh(self):
-        try: self._mtime = os.path.getmtime(onyx_applets.notes_path(self.scope))
+        try: self._mtime = os.path.getmtime(focus_applets.notes_path(self.scope))
         except OSError: self._mtime = 0
         for r in self.lb.get_children(): self.lb.remove(r)
-        notes = onyx_applets.load_notes(self.scope)
+        notes = focus_applets.load_notes(self.scope)
         if not notes:
             e = Gtk.Label(label="Aucune note.\nCliquez « + Nouvelle »."); e.set_xalign(0)
             e.get_style_context().add_class("notes-empty"); e.set_line_wrap(True); e.set_margin_top(8)
@@ -81,13 +81,13 @@ class NotesWidget(Gtk.Box):
         subprocess.Popen(cmd, stdin=subprocess.DEVNULL, start_new_session=True)
 
     def del_note(self, nid):
-        onyx_applets.delete_note(self.scope, nid); self.refresh()
+        focus_applets.delete_note(self.scope, nid); self.refresh()
 
 def make(ctx=None): return NotesWidget(ctx)
 
 if __name__ == "__main__":
-    GLib.set_prgname("onyx-applet-notes")
-    pal = onyx_theme.for_activity(onyx_theme.focused_ws_name())
-    prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css("window{background:@bg@;}" + CSS, pal))
+    GLib.set_prgname("focus-applet-notes")
+    pal = focus_theme.for_activity(focus_theme.focused_ws_name())
+    prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css("window{background:@bg@;}" + CSS, pal))
     Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
     w = Gtk.Window(); w.add(make()); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

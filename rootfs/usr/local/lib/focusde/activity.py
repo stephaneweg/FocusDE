@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# Onyx activity manager v2 : construction fiable, marques par-activite, accueil.
+# Focus DE activity manager v2 : construction fiable, marques par-activite, accueil.
 import subprocess, json, time, os, sys
 DN = subprocess.DEVNULL
 import os; HOME = os.path.expanduser("~")
 LIBDIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, LIBDIR)
-import onyx_applets
+import focus_applets
 
 def sw(c): subprocess.run(["swaymsg", "-q", c], stdout=DN, stderr=DN)
 def get(t):
@@ -127,9 +127,9 @@ def has_app(app_id):
     t = get("get_tree"); return bool(t and scan(t))
 
 def build_home():
-    if has_app("onyx-home"):          # already built -> idempotent, just go there
+    if has_app("focus-home"):          # already built -> idempotent, just go there
         sw("workspace Accueil"); return
-    sw('[app_id="onyx-panel"] kill'); time.sleep(0.3)   # clear any stray half-built panel
+    sw('[app_id="focus-panel"] kill'); time.sleep(0.3)   # clear any stray half-built panel
     names = [w.get("name") for w in (get("get_workspaces") or [])]
     if "Accueil" in names:
         sw("workspace Accueil")
@@ -155,7 +155,7 @@ def hub(category):
     sw('rename workspace to "%s"' % category)
     if category == "Naviguer":
         add("primary", ["env", "MOZ_ENABLE_WAYLAND=1", "firefox-esr",
-                        "--profile", HOME + "/.mozilla/firefox/onyx", "--new-window", "about:blank"])
+                        "--profile", HOME + "/.mozilla/firefox/focus", "--new-window", "about:blank"])
     else:
         add("primary", ["python3", LIBDIR + "/hub.py", category])
     print("hub %s sur ws %s" % (category, ws))
@@ -171,7 +171,7 @@ def rebuild_panel():
         sw("[con_mark=%s] kill" % mark); time.sleep(0.8)
     # le panneau est toujours present (il porte le bouton "+"), meme sans applet
     add("left", ["python3", LIBDIR + "/panel_host.py"])
-    print("panel reconstruit (%d applets)" % len(onyx_applets.load_applet_sel(ws.get("name"))))
+    print("panel reconstruit (%d applets)" % len(focus_applets.load_applet_sel(ws.get("name"))))
 
 def open_agenda():
     # Ouvre (ou bascule vers) l'activite "Agenda" avec l'app agenda.py en zone principale.

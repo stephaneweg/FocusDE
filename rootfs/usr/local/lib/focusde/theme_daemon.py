@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-# Onyx - applique la palette de l'activite au changement de workspace (fluide, sans redemarrage).
+# Focus DE - applique la palette de l'activite au changement de workspace (fluide, sans redemarrage).
 import sys, subprocess, json
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import onyx_theme
+import focus_theme
 
 _last = [None]
 def apply_for(name):
-    pal = onyx_theme.for_activity(name)
+    pal = focus_theme.for_activity(name)
     if pal == _last[0]:
         return
     _last[0] = pal
-    onyx_theme.apply_sway(pal)
-    onyx_theme.write_waybar(pal)
-    onyx_theme.reload_waybar()
+    focus_theme.apply_sway(pal)
+    focus_theme.write_waybar(pal)
+    focus_theme.reload_waybar()
 
 p = subprocess.Popen(["swaymsg", "-t", "subscribe", "-m", "-r", '["workspace"]'],
                      stdout=subprocess.PIPE, text=True)

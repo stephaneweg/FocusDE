@@ -83,7 +83,7 @@ To drive the desktop of a Pi with no monitor, see
 |----------|----------|
 | `/usr/local/lib/focusde/` | the shell code (+ `apps/fmtracker/`) |
 | `/usr/local/bin/fmtracker` | the tracker launcher |
-| `/etc/skel/.config/` | default configuration (sway, waybar, onyx, fuzzel) |
+| `/etc/skel/.config/` | default configuration (sway, waybar, focus, fuzzel) |
 | `/etc/greetd/config.toml` | the login screen |
 | `/usr/share/wayland-sessions/focusde.desktop` | session offered to login managers |
 

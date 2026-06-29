@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - applet Rappel (widget embarquable) : prochains rendez-vous.
+# Focus DE - applet Rappel (widget embarquable) : prochains rendez-vous.
 # Clic sur un RDV / "+ RDV" -> ouvre l'agenda (zone principale) + le dialogue.
 import gi, os, subprocess, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 LIBDIR = os.path.dirname(os.path.realpath(__file__))
-import onyx_theme, onyx_applets
+import focus_theme, focus_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 import os; HOME = os.path.expanduser("~")
@@ -42,16 +42,16 @@ class RappelWidget(Gtk.Box):
         self.refresh(); GLib.timeout_add(1500, self.poll)
 
     def poll(self):
-        try: m = os.path.getmtime(onyx_applets.AGENDA_PATH)
+        try: m = os.path.getmtime(focus_applets.AGENDA_PATH)
         except OSError: m = 0
         if m != self._mtime: self.refresh()
         return True
 
     def refresh(self):
-        try: self._mtime = os.path.getmtime(onyx_applets.AGENDA_PATH)
+        try: self._mtime = os.path.getmtime(focus_applets.AGENDA_PATH)
         except OSError: self._mtime = 0
         for c in self.box.get_children(): self.box.remove(c)
-        events = onyx_applets.upcoming_events(6)
+        events = focus_applets.upcoming_events(6)
         if not events:
             e = Gtk.Label(label="Aucun rendez-vous.\nCliquez « + RDV »."); e.set_xalign(0)
             e.get_style_context().add_class("rappel-empty"); e.set_line_wrap(True)
@@ -60,7 +60,7 @@ class RappelWidget(Gtk.Box):
         for ev in events:
             if ev["date"] != cur:
                 cur = ev["date"]
-                d = Gtk.Label(label=onyx_applets.fr_date(cur)); d.set_xalign(0)
+                d = Gtk.Label(label=focus_applets.fr_date(cur)); d.set_xalign(0)
                 d.get_style_context().add_class("rappel-day"); self.box.pack_start(d, False, False, 0)
             self.box.pack_start(self.row(ev), False, False, 0)
         self.box.show_all()
@@ -85,8 +85,8 @@ class RappelWidget(Gtk.Box):
 def make(ctx=None): return RappelWidget(ctx)
 
 if __name__ == "__main__":
-    GLib.set_prgname("onyx-applet-rappel")
-    pal = onyx_theme.for_activity(onyx_theme.focused_ws_name())
-    prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css("window{background:@bg@;}" + CSS, pal))
+    GLib.set_prgname("focus-applet-rappel")
+    pal = focus_theme.for_activity(focus_theme.focused_ws_name())
+    prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css("window{background:@bg@;}" + CSS, pal))
     Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
     w = Gtk.Window(); w.add(make()); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

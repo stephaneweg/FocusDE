@@ -15,7 +15,7 @@ Everything ships in `rootfs/`, which mirrors `/`:
 |-----------|-------------|------|
 | `rootfs/usr/local/lib/focusde/`        | same | shared **code** (Python + shell logic), read-only |
 | `rootfs/usr/local/lib/focusde/apps/`   | same | hosted apps (fmtracker) |
-| `rootfs/etc/skel/.config/`             | `/etc/skel/.config/` → each user's `~/.config/` | per-user **config** (sway, waybar, onyx, fuzzel) |
+| `rootfs/etc/skel/.config/`             | `/etc/skel/.config/` → each user's `~/.config/` | per-user **config** (sway, waybar, focus, fuzzel) |
 | `rootfs/etc/greetd/config.toml`        | same | login manager → Sway |
 
 The Python scripts locate themselves (`os.path.realpath(__file__)`), so the code
@@ -37,15 +37,15 @@ layout, keybinds that launch the Python tools below.
 `zone_max.py`; `act.json` is the default window layout for a new activity.
 
 **Home / launcher** — `home.py`, `hub.py`, `picker.py` (`$mod+t`); activity
-collections in `…/.config/onyx/hubs/*.list`; `…/.config/fuzzel/fuzzel.ini`.
+collections in `…/.config/focus/hubs/*.list`; `…/.config/fuzzel/fuzzel.ini`.
 
-**Applets** — framework: `applet.py`, `applet_mgr.py`, `onyx_applets.py`,
+**Applets** — framework: `applet.py`, `applet_mgr.py`, `focus_applets.py`,
 `panel_host.py`, `panel_toggle.py`; applets: `applet_clock.py`, `applet_calc.py`,
 `applet_music.py`, `applet_notes.py`, `applet_rappel.py`; per-activity layout in
-`…/.config/onyx/applets/*`.
+`…/.config/focus/applets/*`.
 
-**Theme** — `theme.py`, `theme_apply.py`, `theme_daemon.py`, `onyx_theme.py`
-(`$mod+Shift+t`); definitions in `…/.config/onyx/{theme,themes/{Vert,Bleu}}`.
+**Theme** — `theme.py`, `theme_apply.py`, `theme_daemon.py`, `focus_theme.py`
+(`$mod+Shift+t`); definitions in `…/.config/focus/{theme,themes/{Vert,Bleu}}`.
 
 **Agenda / notes** — `agenda.py`, `event_dialog.py`, `note_dialog.py`.
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# Onyx - accueil (design facon mockup) : en-tete + cartes + grandes tuiles d'activites.
+# Focus DE - accueil (design facon mockup) : en-tete + cartes + grandes tuiles d'activites.
 import gi, subprocess, json, os, time, datetime, getpass, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import onyx_theme
+import focus_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-home")
+GLib.set_prgname("focus-home")
 
 JOURS = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]
 MOIS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet",
@@ -46,7 +46,7 @@ def list_activities():
 
 def profile_name():
     try:
-        n = open(os.path.expanduser("~/.config/onyx/name")).read().strip()
+        n = open(os.path.expanduser("~/.config/focus/name")).read().strip()
         if n: return n
     except Exception:
         pass
@@ -183,7 +183,7 @@ class Home(Gtk.Window):
     def refresh(self):
         self.clock.set_text(time.strftime("%H:%M")); self.build(); return True
 
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS))
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = Home(); w.connect("destroy", Gtk.main_quit); w.show_all()
 w.clock.set_text(time.strftime("%H:%M"))

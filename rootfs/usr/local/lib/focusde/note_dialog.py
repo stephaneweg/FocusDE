@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - dialogue flottant pour creer/voir/editer une note.
+# Focus DE - dialogue flottant pour creer/voir/editer une note.
 # usage: note_dialog.py --scope <scope> [--id <n>]
 import gi, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import onyx_theme, onyx_applets
+import focus_theme, focus_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-note-dialog")
+GLib.set_prgname("focus-note-dialog")
 
 def arg(name, default=None):
     if name in sys.argv:
@@ -38,7 +38,7 @@ class Dlg(Gtk.Window):
         t = Gtk.Label(label="Nouvelle note" if NID is None else "Note"); t.set_xalign(0)
         t.get_style_context().add_class("title")
         head.pack_start(t, True, True, 0)
-        sub = Gtk.Label(label="· " + onyx_applets.scope_label(SCOPE))
+        sub = Gtk.Label(label="· " + focus_applets.scope_label(SCOPE))
         sub.get_style_context().add_class("title"); sub.set_opacity(0.45)
         head.pack_end(sub, False, False, 0)
         box.pack_start(head, False, False, 0)
@@ -58,7 +58,7 @@ class Dlg(Gtk.Window):
         save.connect("clicked", self.save); bar.pack_end(save, False, False, 0)
         box.pack_start(bar, False, False, 0)
         if NID is not None:
-            n = onyx_applets.get_note(SCOPE, NID)
+            n = focus_applets.get_note(SCOPE, NID)
             if n: self.title.set_text(n["title"]); self.body.get_buffer().set_text(n["body"])
         self.connect("key-press-event", self._key)
 
@@ -71,14 +71,14 @@ class Dlg(Gtk.Window):
 
     def save(self, _w):
         title = self.title.get_text().strip() or "Sans titre"
-        onyx_applets.upsert_note(SCOPE, NID, title, self._body_text())
+        focus_applets.upsert_note(SCOPE, NID, title, self._body_text())
         Gtk.main_quit()
 
     def delete(self, _w):
-        onyx_applets.delete_note(SCOPE, NID)
+        focus_applets.delete_note(SCOPE, NID)
         Gtk.main_quit()
 
-pal = onyx_theme.for_activity(onyx_theme.focused_ws_name())
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS, pal))
+pal = focus_theme.for_activity(focus_theme.focused_ws_name())
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = Dlg(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

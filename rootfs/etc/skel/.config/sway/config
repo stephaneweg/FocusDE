@@ -1,7 +1,7 @@
-# Onyx activity-shell -- config etape 2 : theme pastel (onglets = couleur du fond)
+# Focus DE activity-shell -- config etape 2 : theme pastel (onglets = couleur du fond)
 include /etc/sway/config
 
-### Palette pastel Onyx
+### Palette pastel Focus DE
 set $bg        #F3F1FA
 set $tab_on    #DCD3F2
 set $tab_off   #F3F1FA
@@ -34,16 +34,16 @@ client.urgent           $urg_bg  $urg_bg     $urg_ink   $urg_bg     $urg_bg
 ### Activites : le "+" ouvre le selecteur d'apps (souris) avec choix de zone
 show_marks no
 bindsym $mod+t exec python3 /usr/local/lib/focusde/picker.py
-for_window [app_id="onyx-picker"] floating enable, resize set width 780 height 560, move position center
+for_window [app_id="focus-picker"] floating enable, resize set width 780 height 560, move position center
 bindsym $mod+Shift+t exec python3 /usr/local/lib/focusde/theme.py
-for_window [app_id="onyx-theme"] floating enable, resize set width 840 height 600, move position center
-for_window [app_id="onyx-applets"] floating enable, resize set width 460 height 460, move position center
-for_window [app_id="onyx-note-dialog"] floating enable, resize set width 520 height 540, move position center
-for_window [app_id="onyx-event-dialog"] floating enable, resize set width 440 height 560, move position center
+for_window [app_id="focus-theme"] floating enable, resize set width 840 height 600, move position center
+for_window [app_id="focus-applets"] floating enable, resize set width 460 height 460, move position center
+for_window [app_id="focus-note-dialog"] floating enable, resize set width 520 height 540, move position center
+for_window [app_id="focus-event-dialog"] floating enable, resize set width 440 height 560, move position center
 ### Panneau gauche (hote d'applets) : sans bordure
-for_window [app_id="onyx-panel"] border none
+for_window [app_id="focus-panel"] border none
 ### Selecteur d'activites (clic sur le titre) : flottant en haut a gauche
-for_window [app_id="onyx-switcher"] floating enable, border none, resize set width 300 height 380, move position 12 52
+for_window [app_id="focus-switcher"] floating enable, border none, resize set width 300 height 380, move position 12 52
 ### Agrandir/restaurer une zone (bascule vers 2/3-1/3)
 bindsym $mod+Prior exec python3 /usr/local/lib/focusde/zone_max.py primary
 bindsym $mod+Next exec python3 /usr/local/lib/focusde/zone_max.py secondary

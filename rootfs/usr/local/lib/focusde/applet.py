@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# Onyx - panneau gauche : applets (horloge + tuiles).
+# Focus DE - panneau gauche : applets (horloge + tuiles).
 import gi, time, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import onyx_theme
+import focus_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-applet")
+GLib.set_prgname("focus-applet")
 
 CSS = """
 window { background: @bg@; }
@@ -46,7 +46,7 @@ class Applet(Gtk.Window):
         self.date.set_text(time.strftime("%a %d %b"))
         return True
 
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS))
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov,
                                          Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = Applet(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

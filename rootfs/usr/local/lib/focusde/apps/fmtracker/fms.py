@@ -1,6 +1,6 @@
 """Importer for legacy FM-Song ``.fms`` files.
 
-Format (authoritative: the Onyx ``OpenFMS`` reader + QBasic ``FMLIB.BAS``):
+Format (authoritative: the original ``OpenFMS`` reader (FM-Song) + QBasic ``FMLIB.BAS``):
 
     char[15]  signature  "fm-song-project"
     char[20]  name

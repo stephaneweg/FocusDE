@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Onyx - collapse/expand du panneau gauche : on le cache via le scratchpad (vrai masquage).
+# Focus DE - collapse/expand du panneau gauche : on le cache via le scratchpad (vrai masquage).
 import sys, subprocess, json
 def sw(c): subprocess.run(["swaymsg", "-q", c])
 def get(t):

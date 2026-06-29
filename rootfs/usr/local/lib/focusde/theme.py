@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-# Onyx - selecteur de theme : echantillons de palettes, clic = applique.
+# Focus DE - selecteur de theme : echantillons de palettes, clic = applique.
 import gi, subprocess, sys, json
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 LIBDIR = os.path.dirname(os.path.realpath(__file__))
-import onyx_theme
+import focus_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-theme")
+GLib.set_prgname("focus-theme")
 import os; HOME = os.path.expanduser("~")
 
 def focused_ws():
@@ -59,12 +59,12 @@ class ThemeSel(Gtk.Window):
         flow = Gtk.FlowBox(); flow.set_max_children_per_line(5)
         flow.set_selection_mode(Gtk.SelectionMode.NONE); flow.set_valign(Gtk.Align.START)
         sc.add(flow); box.pack_start(sc, True, True, 0)
-        cur = onyx_theme.current()
-        for name in onyx_theme.ORDER:
+        cur = focus_theme.current()
+        for name in focus_theme.ORDER:
             flow.add(self.swatch(name, name == cur))
 
     def swatch(self, name, iscur):
-        C = onyx_theme.colors(name)
+        C = focus_theme.colors(name)
         b = Gtk.Button(); b.get_style_context().add_class("swatch"); b.set_size_request(150, 130)
         p = Gtk.CssProvider(); p.load_from_data(("button.swatch{background:%s;}" % C["bg"]).encode())
         b.get_style_context().add_provider(p, Gtk.STYLE_PROVIDER_PRIORITY_USER)
@@ -90,6 +90,6 @@ class ThemeSel(Gtk.Window):
             subprocess.Popen(["python3", LIBDIR + "/theme_apply.py", name])
         Gtk.main_quit()
 
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS_T))
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS_T))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = ThemeSel(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

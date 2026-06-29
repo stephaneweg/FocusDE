@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - hote du panneau gauche : UNE fenetre qui empile les applets choisis
+# Focus DE - hote du panneau gauche : UNE fenetre qui empile les applets choisis
 # comme des widgets GTK (hauteur naturelle adaptative, pas de bordure, un seul scroll).
 import gi, importlib, subprocess, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 LIBDIR = os.path.dirname(os.path.realpath(__file__))
-import onyx_theme, onyx_applets
+import focus_theme, focus_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-panel")
+GLib.set_prgname("focus-panel")
 import os; HOME = os.path.expanduser("~")
 
 BASE_CSS = """
@@ -21,16 +21,16 @@ scrolledwindow, viewport { background: @bg@; border: none; }
 """
 
 def main():
-    wsname = onyx_theme.focused_ws_name()
-    scope = onyx_applets.notes_scope(wsname)
-    ids = onyx_applets.load_applet_sel(wsname)
+    wsname = focus_theme.focused_ws_name()
+    scope = focus_applets.notes_scope(wsname)
+    ids = focus_applets.load_applet_sel(wsname)
     if not ids:
-        ids = list(onyx_applets.DEFAULT_HOME) if (wsname or "") == "Accueil" else []
+        ids = list(focus_applets.DEFAULT_HOME) if (wsname or "") == "Accueil" else []
     ctx = {"wsname": wsname, "scope": scope}
 
     mods, css = [], BASE_CSS
     for aid in ids:
-        a = onyx_applets.by_id(aid)
+        a = focus_applets.by_id(aid)
         if not a: continue
         try:
             m = importlib.import_module(a["module"])
@@ -38,8 +38,8 @@ def main():
         except Exception as e:
             sys.stderr.write("applet %s: %s\n" % (aid, e))
 
-    pal = onyx_theme.for_activity(wsname)
-    prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(css, pal))
+    pal = focus_theme.for_activity(wsname)
+    prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(css, pal))
     Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov,
                                              Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 

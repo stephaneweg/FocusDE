@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Onyx - agrandir/restaurer une zone (primary=haut / secondary=bas). Bascule vers 2/3-1/3.
+# Focus DE - agrandir/restaurer une zone (primary=haut / secondary=bas). Bascule vers 2/3-1/3.
 import sys, subprocess, json
 def sw(c): subprocess.run(["swaymsg", "-q", c])
 def get(t):

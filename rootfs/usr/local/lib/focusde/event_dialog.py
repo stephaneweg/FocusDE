@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - dialogue flottant : creer / modifier / supprimer un rendez-vous.
+# Focus DE - dialogue flottant : creer / modifier / supprimer un rendez-vous.
 # usage: event_dialog.py [--id <n>] [--date YYYY-MM-DD]
 import gi, sys, datetime
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import onyx_theme, onyx_applets
+import focus_theme, focus_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-event-dialog")
+GLib.set_prgname("focus-event-dialog")
 
 def arg(name, default=None):
     if name in sys.argv:
@@ -63,7 +63,7 @@ class Dlg(Gtk.Window):
         # pre-remplissage
         date = arg("--date")
         if EID is not None:
-            e = onyx_applets.get_event(EID)
+            e = focus_applets.get_event(EID)
             if e:
                 self.title.set_text(e["title"]); self.note.set_text(e.get("note", ""))
                 date = e["date"]
@@ -86,13 +86,13 @@ class Dlg(Gtk.Window):
         date = "%04d-%02d-%02d" % (y, mo + 1, da)
         tm = "%02d:%02d" % (int(self.hh.get_value()), int(self.mm.get_value()))
         title = self.title.get_text().strip() or "Rendez-vous"
-        onyx_applets.upsert_event(EID, date, tm, title, self.note.get_text().strip())
+        focus_applets.upsert_event(EID, date, tm, title, self.note.get_text().strip())
         Gtk.main_quit()
 
     def delete(self, _w):
-        onyx_applets.delete_event(EID); Gtk.main_quit()
+        focus_applets.delete_event(EID); Gtk.main_quit()
 
-pal = onyx_theme.for_activity(onyx_theme.focused_ws_name())
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS, pal))
+pal = focus_theme.for_activity(focus_theme.focused_ws_name())
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = Dlg(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

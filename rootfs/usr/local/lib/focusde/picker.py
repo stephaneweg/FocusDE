@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-# Onyx - sélecteur d'apps à la souris : choisir la zone + cliquer une app -> ajoutée à la zone.
+# Focus DE - sélecteur d'apps à la souris : choisir la zone + cliquer une app -> ajoutée à la zone.
 import gi, subprocess, json, os, glob, re, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import onyx_theme
+import focus_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-picker")
+GLib.set_prgname("focus-picker")
 
 def sway_get(t):
     try: return json.loads(subprocess.check_output(["swaymsg", "-t", t]))
@@ -19,7 +19,7 @@ def focused_ws_name():
         if w.get("focused"): return w.get("name")
     return None
 def slug(n): return re.sub(r'[^a-zA-Z0-9]+', '_', n or "").strip('_') or "act"
-def hub_file(n): return os.path.expanduser("~/.config/onyx/hubs/%s.list" % slug(n))
+def hub_file(n): return os.path.expanduser("~/.config/focus/hubs/%s.list" % slug(n))
 def available_zones():
     # le panneau gauche est gere par le gestionnaire d'applets (+ Applet), pas ici.
     return [("primary", "En haut"), ("secondary", "En bas"), ("raccourci", "Raccourci (hub)")]
@@ -139,6 +139,6 @@ class Picker(Gtk.Window):
             self.flow.add(self.app_btn(a))
         self.flow.show_all()
 
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS))
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = Picker(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

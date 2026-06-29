@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - applet Horloge (widget embarquable dans panel_host).
+# Focus DE - applet Horloge (widget embarquable dans panel_host).
 import gi, time, datetime, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import onyx_theme
+import focus_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 
@@ -38,8 +38,8 @@ class ClockWidget(Gtk.Box):
 def make(ctx=None): return ClockWidget(ctx)
 
 if __name__ == "__main__":
-    GLib.set_prgname("onyx-applet-clock")
-    pal = onyx_theme.for_activity(onyx_theme.focused_ws_name())
-    prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css("window{background:@bg@;}" + CSS, pal))
+    GLib.set_prgname("focus-applet-clock")
+    pal = focus_theme.for_activity(focus_theme.focused_ws_name())
+    prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css("window{background:@bg@;}" + CSS, pal))
     Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
     w = Gtk.Window(); w.add(make()); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

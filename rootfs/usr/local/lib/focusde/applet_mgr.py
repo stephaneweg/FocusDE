@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - gestionnaire d'applets : cocher les VRAIS applets du panneau gauche.
+# Focus DE - gestionnaire d'applets : cocher les VRAIS applets du panneau gauche.
 # "Appliquer" enregistre la selection et reconstruit le panneau (une fenetre panel_host).
 import gi, subprocess, json, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
 LIBDIR = os.path.dirname(os.path.realpath(__file__))
-import onyx_theme, onyx_applets
+import focus_theme, focus_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-applets")
+GLib.set_prgname("focus-applets")
 import os; HOME = os.path.expanduser("~")
 
 def focused():
@@ -33,8 +33,8 @@ class Mgr(Gtk.Window):
         super().__init__(title="Applets")
         self.set_default_size(460, 460)
         self.wsname, self.wsid = focused()
-        sel = set(onyx_applets.load_applet_sel(self.wsname))
-        self.apps = onyx_applets.APPLETS
+        sel = set(focus_applets.load_applet_sel(self.wsname))
+        self.apps = focus_applets.APPLETS
         self.state = [a["id"] in sel for a in self.apps]
         box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
         for m in ("top", "start", "end", "bottom"): getattr(box, "set_margin_" + m)(16)
@@ -72,12 +72,12 @@ class Mgr(Gtk.Window):
 
     def apply(self):
         ids = [self.apps[i]["id"] for i in range(len(self.apps)) if self.state[i]]
-        onyx_applets.save_applet_sel(self.wsname, ids)
+        focus_applets.save_applet_sel(self.wsname, ids)
         subprocess.Popen(["python3", LIBDIR + "/activity.py", "panel"],
                          stdin=subprocess.DEVNULL, start_new_session=True)
         Gtk.main_quit()
 
-pal = onyx_theme.for_activity(onyx_theme.focused_ws_name())
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS, pal))
+pal = focus_theme.for_activity(focus_theme.focused_ws_name())
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = Mgr(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()

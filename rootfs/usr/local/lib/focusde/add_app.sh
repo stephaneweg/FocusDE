@@ -7,7 +7,7 @@ export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
 export SWAYSOCK="${SWAYSOCK:-$(ls "$RUN"/sway-ipc.*.sock 2>/dev/null | head -1)}"
 export MOZ_ENABLE_WAYLAND=1
 ZONE="$1"
-FF="firefox-esr --profile $HOME/.mozilla/firefox/onyx --new-window"
+FF="firefox-esr --profile $HOME/.mozilla/firefox/focus --new-window"
 choice=$(printf 'Firefox\nAbiWord\nGnumeric\nTerminal\nSite web…\n' | fuzzel --dmenu -p "$ZONE > ")
 [ -z "$choice" ] && exit 0
 case "$choice" in

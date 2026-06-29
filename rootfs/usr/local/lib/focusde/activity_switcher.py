@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-# Onyx / Focus DE - menu deroulant des activites (clic sur le titre dans la barre).
+# Focus DE - menu deroulant des activites (clic sur le titre dans la barre).
 # Liste les activites ouvertes -> clic = bascule. Echap/focus perdu = ferme.
 import gi, json, subprocess, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
-import onyx_theme
+import focus_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
-GLib.set_prgname("onyx-switcher")
+GLib.set_prgname("focus-switcher")
 
 def workspaces():
     try:
@@ -47,7 +47,7 @@ class Switcher(Gtk.Window):
     def go(self, _b, name):
         subprocess.run(["swaymsg", "-q", "workspace " + name]); Gtk.main_quit()
 
-pal = onyx_theme.for_activity(onyx_theme.focused_ws_name())
-prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS, pal))
+pal = focus_theme.for_activity(focus_theme.focused_ws_name())
+prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
 w = Switcher(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()
