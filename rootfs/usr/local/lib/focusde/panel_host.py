@@ -3,6 +3,7 @@
 # comme des widgets GTK (hauteur naturelle adaptative, pas de bordure, un seul scroll).
 import gi, importlib, subprocess, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+LIBDIR = os.path.dirname(os.path.realpath(__file__))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -53,7 +54,7 @@ def main():
     addb = Gtk.Button(label="+"); addb.get_style_context().add_class("panel-add")
     addb.set_tooltip_text("Ajouter / retirer des applets")
     addb.connect("clicked", lambda _w: subprocess.Popen(
-        ["python3", HOME + "/applet_mgr.py"], stdin=subprocess.DEVNULL, start_new_session=True))
+        ["python3", LIBDIR + "/applet_mgr.py"], stdin=subprocess.DEVNULL, start_new_session=True))
     head.pack_end(addb, False, False, 0)
     root.pack_start(head, False, False, 0)
     # zone defilante : les applets s'empilent a leur hauteur naturelle ; scroll si ca deborde

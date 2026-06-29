@@ -3,6 +3,7 @@
 # Clic sur un rdv = modifier ; "+ Nouveau" = creer ; double-clic sur un jour = creer ce jour-la.
 import gi, os, subprocess, sys, datetime
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+LIBDIR = os.path.dirname(os.path.realpath(__file__))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -141,7 +142,7 @@ class Agenda(Gtk.Window):
         b.connect("clicked", lambda _w: self.edit(ev["id"])); return b
 
     def edit(self, eid, date=None):
-        cmd = ["python3", HOME + "/event_dialog.py"]
+        cmd = ["python3", LIBDIR + "/event_dialog.py"]
         if eid is not None: cmd += ["--id", str(eid)]
         if date is not None: cmd += ["--date", date]
         subprocess.Popen(cmd, stdin=subprocess.DEVNULL, start_new_session=True)

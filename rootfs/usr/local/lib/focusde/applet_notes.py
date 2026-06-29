@@ -3,6 +3,7 @@
 # scope "__global__" depuis l'accueil. oeil = voir/editer, croix = supprimer, + Nouvelle.
 import gi, os, subprocess, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+LIBDIR = os.path.dirname(os.path.realpath(__file__))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -75,7 +76,7 @@ class NotesWidget(Gtk.Box):
         b.set_relief(Gtk.ReliefStyle.NONE); b.connect("clicked", lambda _w: cb(arg)); return b
 
     def open_note(self, nid):
-        cmd = ["python3", HOME + "/note_dialog.py", "--scope", self.scope]
+        cmd = ["python3", LIBDIR + "/note_dialog.py", "--scope", self.scope]
         if nid is not None: cmd += ["--id", str(nid)]
         subprocess.Popen(cmd, stdin=subprocess.DEVNULL, start_new_session=True)
 

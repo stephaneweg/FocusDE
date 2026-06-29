@@ -3,6 +3,7 @@
 # "Appliquer" enregistre la selection et reconstruit le panneau (une fenetre panel_host).
 import gi, subprocess, json, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+LIBDIR = os.path.dirname(os.path.realpath(__file__))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -72,7 +73,7 @@ class Mgr(Gtk.Window):
     def apply(self):
         ids = [self.apps[i]["id"] for i in range(len(self.apps)) if self.state[i]]
         onyx_applets.save_applet_sel(self.wsname, ids)
-        subprocess.Popen(["python3", HOME + "/activity.py", "panel"],
+        subprocess.Popen(["python3", LIBDIR + "/activity.py", "panel"],
                          stdin=subprocess.DEVNULL, start_new_session=True)
         Gtk.main_quit()
 

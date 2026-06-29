@@ -2,6 +2,7 @@
 # Onyx - selecteur de theme : echantillons de palettes, clic = applique.
 import gi, subprocess, sys, json
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+LIBDIR = os.path.dirname(os.path.realpath(__file__))
 import onyx_theme
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -84,9 +85,9 @@ class ThemeSel(Gtk.Window):
 
     def apply(self, name):
         if self.mode == "activity" and self.actname and self.actname != "Accueil":
-            subprocess.Popen(["python3", HOME + "/theme_apply.py", "--activity", self.actname, name])
+            subprocess.Popen(["python3", LIBDIR + "/theme_apply.py", "--activity", self.actname, name])
         else:
-            subprocess.Popen(["python3", HOME + "/theme_apply.py", name])
+            subprocess.Popen(["python3", LIBDIR + "/theme_apply.py", name])
         Gtk.main_quit()
 
 prov = Gtk.CssProvider(); prov.load_from_data(onyx_theme.css(CSS_T))

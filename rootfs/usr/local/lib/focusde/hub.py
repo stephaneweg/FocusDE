@@ -6,7 +6,8 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
 GLib.set_prgname("onyx-hub")
 import os; HOME = os.path.expanduser("~")
-sys.path.insert(0, HOME)
+LIBDIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, LIBDIR)
 import onyx_theme
 
 CATMAP = {
@@ -117,7 +118,7 @@ class Hub(Gtk.Window):
         nm.set_line_wrap(True); nm.set_max_width_chars(12); nm.set_justify(Gtk.Justification.CENTER)
         v.pack_start(img, False, False, 0); v.pack_start(nm, False, False, 0); b.add(v)
         b.connect("clicked", lambda _w, cmd=a["cmd"]:
-                  subprocess.Popen(["python3", HOME + "/activity.py", "add", "primary"] + cmd.split()))
+                  subprocess.Popen(["python3", LIBDIR + "/activity.py", "add", "primary"] + cmd.split()))
         return b
 
 args = sys.argv[1:]

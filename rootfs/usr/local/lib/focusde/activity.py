@@ -3,7 +3,8 @@
 import subprocess, json, time, os, sys
 DN = subprocess.DEVNULL
 import os; HOME = os.path.expanduser("~")
-sys.path.insert(0, HOME)
+LIBDIR = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, LIBDIR)
 import onyx_applets
 
 def sw(c): subprocess.run(["swaymsg", "-q", c], stdout=DN, stderr=DN)
@@ -48,8 +49,8 @@ def build_activity(ws, name, left=False):
     # Nouvelle activite = hub vide en zone principale (l'utilisateur le remplit via + > Raccourci).
     sw("workspace %s" % ws); time.sleep(0.3)
     sw('rename workspace to "%s"' % name)
-    add("primary", ["python3", HOME + "/hub.py", "--custom", name])
-    add("left", ["python3", HOME + "/panel_host.py"])   # panneau (avec le bouton "+")
+    add("primary", ["python3", LIBDIR + "/hub.py", "--custom", name])
+    add("left", ["python3", LIBDIR + "/panel_host.py"])   # panneau (avec le bouton "+")
     print("activite (hub vide) ws=%s name=%s" % (ws, name))
 
 def ws_window_ids(wsid):
@@ -125,9 +126,9 @@ def build_home():
         sw("rename workspace to Accueil")   # au boot : renommer la courante (le switch ne prend pas tot)
     time.sleep(0.4)
     # panneau gauche = UNE fenetre hote empilant les applets (defaut accueil : horloge + notes)
-    L = launch_get(["python3", HOME + "/panel_host.py"]); time.sleep(0.6)
+    L = launch_get(["python3", LIBDIR + "/panel_host.py"]); time.sleep(0.6)
     sw("[con_id=%d] focus" % L); sw("split horizontal")
-    M = launch_get(["python3", HOME + "/home.py"]); time.sleep(0.6)     # zone principale (app accueil)
+    M = launch_get(["python3", LIBDIR + "/home.py"]); time.sleep(0.6)     # zone principale (app accueil)
     sw("[con_id=%d] focus" % L); sw("resize set width 240 px")
     # marquer le panneau (comme une activite) pour que "+ Applet" le remplace au lieu d'en creer un 2e
     ws = focused_ws()
@@ -145,7 +146,7 @@ def hub(category):
         add("primary", ["env", "MOZ_ENABLE_WAYLAND=1", "firefox-esr",
                         "--profile", HOME + "/.mozilla/firefox/onyx", "--new-window", "about:blank"])
     else:
-        add("primary", ["python3", HOME + "/hub.py", category])
+        add("primary", ["python3", LIBDIR + "/hub.py", category])
     print("hub %s sur ws %s" % (category, ws))
 
 def rebuild_panel():
@@ -158,7 +159,7 @@ def rebuild_panel():
         # ca selectionnerait le conteneur de l'espace -> tuerait aussi la section principale)
         sw("[con_mark=%s] kill" % mark); time.sleep(0.8)
     # le panneau est toujours present (il porte le bouton "+"), meme sans applet
-    add("left", ["python3", HOME + "/panel_host.py"])
+    add("left", ["python3", LIBDIR + "/panel_host.py"])
     print("panel reconstruit (%d applets)" % len(onyx_applets.load_applet_sel(ws.get("name"))))
 
 def open_agenda():
@@ -169,7 +170,7 @@ def open_agenda():
     else:
         ws = str(free_num()); sw("workspace " + ws); time.sleep(0.3)
         sw('rename workspace to "Agenda"')
-        add("primary", ["python3", HOME + "/agenda.py"])
+        add("primary", ["python3", LIBDIR + "/agenda.py"])
     print("agenda")
 
 if __name__ == "__main__":

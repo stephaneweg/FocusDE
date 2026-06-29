@@ -3,6 +3,7 @@
 # Clic sur un RDV / "+ RDV" -> ouvre l'agenda (zone principale) + le dialogue.
 import gi, os, subprocess, sys
 import os; sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+LIBDIR = os.path.dirname(os.path.realpath(__file__))
 import onyx_theme, onyx_applets
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk
@@ -74,9 +75,9 @@ class RappelWidget(Gtk.Box):
         b.add(h); b.connect("clicked", lambda _w: self.open_agenda(ev["id"])); return b
 
     def open_agenda(self, eid):
-        subprocess.Popen(["python3", HOME + "/activity.py", "agenda"],
+        subprocess.Popen(["python3", LIBDIR + "/activity.py", "agenda"],
                          stdin=subprocess.DEVNULL, start_new_session=True)
-        cmd = ["python3", HOME + "/event_dialog.py"]
+        cmd = ["python3", LIBDIR + "/event_dialog.py"]
         if eid is not None: cmd += ["--id", str(eid)]
         GLib.timeout_add(700, lambda: (subprocess.Popen(cmd, stdin=subprocess.DEVNULL,
                                                         start_new_session=True), False)[1])
