@@ -44,6 +44,8 @@ for_window [app_id="focus-event-dialog"] floating enable, resize set width 440 h
 for_window [app_id="focus-panel"] border none
 ### Selecteur d'activites (clic sur le titre) : flottant en haut a gauche
 for_window [app_id="focus-switcher"] floating enable, border none, resize set width 300 height 380, move position 12 52
+### Confirmation d'arret d'activite (bouton rouge waybar) : flottant centre
+for_window [app_id="focus-stop"] floating enable, border none, resize set width 420 height 200, move position center
 ### Agrandir/restaurer une zone (bascule vers 2/3-1/3)
 bindsym $mod+Prior exec python3 /usr/local/lib/focusde/zone_max.py primary
 bindsym $mod+Next exec python3 /usr/local/lib/focusde/zone_max.py secondary

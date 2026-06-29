@@ -186,10 +186,43 @@ def open_agenda():
         add("primary", ["python3", LIBDIR + "/agenda.py"])
     print("agenda")
 
+def record_activity(name):
+    # Accroche persistance (a venir) : enregistrer l'activite arretee pour qu'elle
+    # reste visible a l'accueil (a cote des hubs) et puisse etre relancee plus tard.
+    # Cible : un registre ~/.local/share/focusde/activities.json -- PAS encore implemente.
+    # No-op volontaire pour l'instant : on garde le point d'accroche ici pour ne pas
+    # avoir a retoucher stop() quand le registre arrivera.
+    pass
+
+def stop(target=None):
+    # Arrete une activite : ferme TOUTES ses fenetres -> sway detruit le workspace vide
+    # tout seul -> retour Accueil. La RAM des apps (Firefox, AbiWord...) est rendue.
+    # target = nom ou numero de workspace ; defaut = activite focalisee.
+    wss = get("get_workspaces") or []
+    w = None
+    if target:
+        for x in wss:
+            if x.get("name") == target or str(x.get("num")) == str(target): w = x; break
+    else:
+        w = focused_ws()
+    if not w:
+        print("stop: aucune activite ciblee"); return 1
+    name = w.get("name")
+    if name == "Accueil":
+        print("stop: l'accueil n'est pas une activite"); return 1
+    record_activity(name)                      # accroche persistance (no-op pour l'instant)
+    ids = ws_window_ids(w["id"])
+    for cid in ids:
+        sw("[con_id=%d] kill" % cid)
+    time.sleep(0.4)                            # laisser sway recycler le workspace vide
+    sw("workspace Accueil")
+    print("stop: '%s' arretee (%d fenetres fermees)" % (name, len(ids)))
+    return 0
+
 if __name__ == "__main__":
     a = sys.argv[1:]
     if not a:
-        print("usage: new [--auto|<ws>] <name> [--left] | add <zone> <cmd...> | home | agenda"); sys.exit(2)
+        print("usage: new [--auto|<ws>] <name> [--left] | add <zone> <cmd...> | stop [<ws>] | home | agenda"); sys.exit(2)
     if a[0] == "new":
         left = "--left" in a
         rest = [x for x in a[1:] if x != "--left"]
@@ -200,6 +233,8 @@ if __name__ == "__main__":
         build_activity(ws, name, left=left)
     elif a[0] == "add":
         sys.exit(add(a[1], a[2:]))
+    elif a[0] == "stop":
+        sys.exit(stop(" ".join(a[1:]) or None))
     elif a[0] == "home":
         build_home()
     elif a[0] == "hub":

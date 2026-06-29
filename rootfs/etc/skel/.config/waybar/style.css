@@ -1,6 +1,8 @@
 * { font-family: "Sans"; font-size: 14px; border: none; min-height: 0; }
 window#waybar { background: #F3F1FA; color: #4B3FA0; }
 #custom-activity { font-size: 17px; font-weight: bold; color: #2C2A38; padding: 0 20px; }
+#custom-stop { background: #E5484D; color: #FFFFFF; border-radius: 12px; padding: 4px 14px; margin: 6px 8px; font-weight: bold; }
+#custom-stop:hover { background: #C93B40; }
 #custom-add { background: #DCD3F2; color: #4B3FA0; border-radius: 12px; padding: 4px 16px; margin: 6px 4px; }
 #custom-add:hover { background: #C9BEEA; }
 #custom-applet { background: #DCD3F2; color: #4B3FA0; border-radius: 12px; padding: 4px 14px; margin: 6px 4px; }

@@ -129,6 +129,8 @@ def apply_sway(pal=None):
 WAYBAR_STYLE = """* { font-family: "Sans"; font-size: 14px; border: none; min-height: 0; }
 window#waybar { background: %(bg)s; color: %(accent_ink)s; }
 #custom-activity { font-size: 17px; font-weight: bold; color: %(ink)s; padding: 0 20px; }
+#custom-stop { background: #E5484D; color: #FFFFFF; border-radius: 12px; padding: 4px 14px; margin: 6px 8px; font-weight: bold; }
+#custom-stop:hover { background: #C93B40; }
 #custom-add { background: %(accent)s; color: %(accent_ink)s; border-radius: 12px; padding: 4px 16px; margin: 6px 4px; }
 #custom-add:hover { background: %(accent_strong)s; }
 #custom-applet { background: %(accent)s; color: %(accent_ink)s; border-radius: 12px; padding: 4px 14px; margin: 6px 4px; }
