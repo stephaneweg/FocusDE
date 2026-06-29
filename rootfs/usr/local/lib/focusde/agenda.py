@@ -39,6 +39,8 @@ class Agenda(Gtk.Window):
         head.pack_start(t, True, True, 0)
         self.stack = Gtk.Stack(); self.stack.set_transition_type(Gtk.StackTransitionType.CROSSFADE)
         sw = Gtk.StackSwitcher(); sw.set_stack(self.stack); head.pack_start(sw, False, False, 0)
+        cb = Gtk.Button(label="✕ Fermer"); cb.get_style_context().add_class("new")
+        cb.connect("clicked", lambda _w: self.destroy()); head.pack_end(cb, False, False, 0)
         nb = Gtk.Button(label="+ Nouveau"); nb.get_style_context().add_class("new")
         nb.connect("clicked", lambda _w: self.edit(None)); head.pack_end(nb, False, False, 0)
         outer.pack_start(head, False, False, 0)
