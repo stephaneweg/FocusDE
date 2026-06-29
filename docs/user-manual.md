@@ -1,208 +1,224 @@
-# Focus DE — Manuel d'utilisation
+# Focus DE — User Manual
 
-Focus DE est un environnement de bureau Linux **organisé par activités** plutôt que
-par fenêtres en vrac. Il est pensé pour rester simple et lisible (look pastel, sans
-bordures), aussi bien pour une démonstration que pour un Raspberry Pi familial.
+Focus DE is a Linux desktop environment **organised around activities** rather than
+loose windows. It aims to stay simple and legible (pastel, borderless look), suitable
+both for a demo and for a family Raspberry Pi.
 
----
-
-## 1. Le concept
-
-Au lieu d'empiler des fenêtres sur un bureau, Focus DE regroupe ce que vous faites
-en **activités**. Une activité, c'est un contexte (un projet, un jeu, une session de
-travail…) qui occupe tout l'écran et se découpe en **zones**. Quand vous prenez du
-recul, vous retombez sur l'**Accueil** : la vue d'ensemble de vos activités.
-
-C'est inspiré du bureau *Sugar* (OLPC) : on « zoome » entre la vue d'ensemble
-(l'Accueil) et une activité précise.
-
-Trois idées suffisent pour tout comprendre :
-
-- **Activité** — un espace plein écran dédié à une tâche (= un *workspace* Sway).
-- **Zone** — une activité se divise en *écran principal* (haut), *écran secondaire*
-  (bas) et un *panneau* à gauche.
-- **Applet** — une petite vignette utilitaire (horloge, notes…) posée dans le panneau.
+> The on-screen interface is in French; this manual keeps the real button labels
+> (e.g. **Accueil** = *Home*, **Créer** = *Create*) and explains them in English.
 
 ---
 
-## 2. Le bureau en un coup d'œil
+## 1. The concept
 
-![L'Accueil de Focus DE](images/home.png)
+Instead of stacking windows on a desktop, Focus DE groups what you do into
+**activities**. An activity is a context (a project, a game, a work session…) that
+fills the screen and is split into **zones**. When you step back, you return to the
+**Accueil** (Home): the overview of your activities.
 
-En haut, une **barre** discrète :
+It is inspired by the *Sugar* desktop (OLPC): you "zoom" between the overview (Home)
+and a single activity.
 
-| Élément | Rôle |
+Three ideas are enough to understand everything:
+
+- **Activity** — a full-screen space dedicated to one task (a Sway *workspace*).
+- **Zone** — an activity is divided into a *primary screen* (top), a *secondary
+  screen* (bottom) and a *panel* on the left.
+- **Applet** — a small utility tile (clock, notes…) placed in the panel.
+
+---
+
+## 2. The desktop at a glance
+
+![Focus DE Home](images/home.png)
+
+A discreet **bar** sits at the top:
+
+| Element | Role |
 |--------|------|
-| *(à gauche)* nom de l'activité | l'activité courante |
-| **+ App** | ajouter une application (ouvre le sélecteur) |
-| **Panneau** | afficher / masquer le panneau d'applets |
-| **Accueil** | revenir à la vue d'ensemble |
-| *(à droite)* horloge | l'heure |
+| *(left)* activity name | the current activity |
+| **+ App** | add an application (opens the picker) |
+| **Panneau** | show / hide the applet panel |
+| **Accueil** | go back to the overview |
+| *(right)* clock | the time |
 
 ---
 
-## 3. L'Accueil
+## 3. Accueil — the Home
 
-L'Accueil est votre point de départ (cliquez **Accueil** dans la barre à tout moment).
-On y trouve :
+The Home is your starting point (click **Accueil** in the bar at any time). It shows:
 
-- un **bonjour** personnalisé et la date ;
-- des **cartes** d'état (*Reprendre*, *En ce moment*, *Aujourd'hui*) ;
-- les **tuiles de hubs** (*Travailler, Apprendre, Jouer, Naviguer, Créer*) — voir §7 ;
-- vos **activités** ouvertes (une tuile colorée chacune) ;
-- la tuile **+ Nouvelle activité** ;
-- à gauche, le **panneau d'applets** (par défaut : Horloge + Notes).
-
----
-
-## 4. Les activités
-
-**Créer une activité** : cliquez la tuile **+ Nouvelle activité**, donnez-lui un nom.
-Elle s'ouvre vide, prête à être remplie d'applications.
-
-**Basculer entre activités** : cliquez sa tuile depuis l'Accueil. (Sous le capot,
-chaque activité est un espace de travail Sway ; `Super`+`1`…`9` fonctionne aussi.)
+- a personalised **greeting** and the date;
+- status **cards** (*Reprendre* = Resume, *En ce moment* = Now playing, *Aujourd'hui*
+  = Today);
+- the **hub tiles** (*Travailler, Apprendre, Jouer, Naviguer, Créer*) — see §7;
+- your open **activities** (one coloured tile each);
+- the **+ Nouvelle activité** (New activity) tile;
+- on the left, the **applet panel** (by default: Clock + Notes).
 
 ---
 
-## 5. Les zones : écran principal, secondaire et panneau
+## 4. Activities
 
-![Une activité avec deux zones (haut/bas) et le panneau](images/activity-zones.png)
+**Create an activity**: click the **+ Nouvelle activité** tile and give it a name. It
+opens empty, ready to be filled with applications.
 
-Une activité se compose de trois zones :
-
-- **Écran principal** (en haut) — la zone de travail principale ;
-- **Écran secondaire** (en bas) — une seconde zone, par ex. un terminal ou des notes ;
-- **Panneau** (à gauche) — accueille les applets et le bouton **+**.
-
-Quand une zone contient plusieurs applications, elles se rangent en **onglets**
-(barres colorées en haut de la zone). 
-
-**Agrandir une zone** (plein écran temporaire) :
-
-- `Super`+`Page ↑` → agrandir l'**écran principal** ;
-- `Super`+`Page ↓` → agrandir l'**écran secondaire**.
+**Switch activities**: click its tile from the Home. (Under the hood each activity is
+a Sway workspace; `Super`+`1`…`9` also works.)
 
 ---
 
-## 6. Ajouter une application
+## 5. Zones: primary, secondary and panel
 
-![Le sélecteur d'applications (+ App)](images/picker.png)
+![An activity with two zones (top/bottom) and the panel](images/activity-zones.png)
 
-Cliquez **+ App** dans la barre (ou `Super`+`T`). Le sélecteur s'ouvre :
+An activity has three zones:
 
-1. Choisissez **où** l'ajouter : **En haut** (écran principal), **En bas** (écran
-   secondaire), ou **Raccourci (hub)** pour l'épingler dans un hub (§7).
-2. Cherchez/cliquez l'application — la liste reprend **toutes** les applications
-   installées sur le système.
+- **Primary screen** (top) — the main work area;
+- **Secondary screen** (bottom) — a second area, e.g. a terminal or notes;
+- **Panel** (left) — holds the applets and the **+** button.
 
-L'application s'ouvre dans la zone choisie (en onglet si la zone est déjà occupée).
+When a zone holds several applications, they line up as **tabs** (the coloured bars
+at the top of a zone).
 
----
+**Maximise a zone** (temporary full screen):
 
-## 7. Les hubs (catégories d'applications)
-
-![Le hub « Créer »](images/hub-creer.png)
-
-Depuis l'Accueil, les tuiles **Travailler / Apprendre / Jouer / Naviguer / Créer**
-ouvrent un **hub** : une grille d'applications de cette catégorie, remplie
-automatiquement d'après les catégories standard *freedesktop* :
-
-| Hub | Contenu |
-|-----|---------|
-| **Travailler** | bureautique (traitement de texte, tableur, finance…) |
-| **Apprendre** | logiciels éducatifs |
-| **Jouer** | jeux |
-| **Naviguer** | le navigateur web |
-| **Créer** | outils de **création** — graphisme **et** audio/musique |
-
-> Le hub **Créer** distingue la *création* de la *consultation* : il affiche les
-> éditeurs (dessin, retouche, tracker audio…) et **exclut** les simples visualiseurs
-> d'images/documents et lecteurs multimédia.
-
-Vous pouvez aussi **épingler** n'importe quelle application dans un hub via le
-sélecteur (**+ App** → zone **Raccourci (hub)**).
+- `Super`+`Page Up` → maximise the **primary** screen;
+- `Super`+`Page Down` → maximise the **secondary** screen.
 
 ---
 
-## 8. Les applets (panneau de gauche)
+## 6. Adding an application
 
-![Le gestionnaire d'applets](images/applets.png)
+![The application picker (+ App)](images/picker.png)
 
-Le panneau de gauche héberge des **applets**. Cliquez le **+** en haut du panneau
-(« Applets ») pour choisir ceux à afficher, puis **Appliquer**.
+Click **+ App** in the bar (or press `Super`+`T`). The picker opens:
 
-| Applet | Description | Utilisation |
-|--------|-------------|-------------|
-| **Horloge** | Heure et date | affichage simple |
-| **Notes** | Notes de l'activité (ou *partout* depuis l'Accueil) | **+ Nouvelle** pour ajouter ; l'**œil** affiche une note, la **corbeille** la supprime |
-| **Calculatrice** | Petits calculs | calculs rapides sans quitter l'activité |
-| **Musique** | Lecteur des fichiers de `~/Music` | écouter sa musique |
-| **Rappel** | Prochains rendez-vous de l'agenda | aperçu de l'agenda |
+1. Choose **where** to add it: **En haut** (primary), **En bas** (secondary), or
+   **Raccourci (hub)** to pin it into a hub (§7).
+2. Search/click the application — the list contains **every** application installed
+   on the system.
 
-Le bouton **Panneau** de la barre affiche/masque le panneau.
+The application opens in the chosen zone (as a tab if the zone is already occupied).
 
 ---
 
-## 9. Logiciels intégrés
+## 7. Hubs (application categories)
+
+![The "Créer" (Create) hub](images/hub-creer.png)
+
+From the Home, the **Travailler / Apprendre / Jouer / Naviguer / Créer** tiles open a
+**hub**: a grid of applications for that category, filled automatically from the
+standard *freedesktop* categories:
+
+| Hub | Contents |
+|-----|----------|
+| **Travailler** (Work) | office apps (word processor, spreadsheet, finance…) |
+| **Apprendre** (Learn) | educational software |
+| **Jouer** (Play) | games |
+| **Naviguer** (Browse) | the web browser |
+| **Créer** (Create) | **creation** tools — graphics **and** audio/music |
+
+> The **Créer** hub distinguishes *creation* from *consumption*: it lists editors
+> (drawing, image editing, audio trackers…) and **excludes** plain image/document
+> viewers and media players.
+
+You can also **pin** any application into a hub from the picker (**+ App** → the
+**Raccourci (hub)** zone).
+
+---
+
+## 8. Applets (left panel)
+
+![The applet manager](images/applets.png)
+
+The left panel hosts **applets**. Click the **+** at the top of the panel
+("Applets") to choose which ones to show, then **Appliquer** (Apply).
+
+| Applet | Description | Usage |
+|--------|-------------|-------|
+| **Horloge** (Clock) | Time and date | simple display |
+| **Notes** | Activity notes (or *everywhere* from the Home) | **+ Nouvelle** to add; the **eye** shows a note, the **trash** deletes it |
+| **Calculatrice** (Calculator) | Quick sums | calculations without leaving the activity |
+| **Musique** (Music) | Plays files from `~/Music` | listen to your music (MP3/OGG/FLAC…) |
+| **FM-Player** | Plays FM-Song `.fms` tunes | a single file or a whole folder — see below |
+| **Rappel** (Reminder) | Upcoming agenda events | a glance at your agenda |
+
+The **Panneau** button in the bar shows/hides the panel.
+
+### The FM-Player applet
+
+![The FM-Player applet in the panel](images/applet-fmplayer.png)
+
+FM-Player plays **FM-Song `.fms`** tunes right in the panel, using the FM-Song
+Tracker engine (fluidsynth + a General-MIDI SoundFont):
+
+- **Dossier** (Folder) loads a whole folder as a playlist; **Fichier** (File) loads a
+  single tune. By default it scans `~/fms` (then `~/Music`).
+- Transport: previous / **play–pause** / stop / next. Click a tune in the list to
+  play it; the player auto-advances to the next when one finishes.
+
+---
+
+## 9. Built-in software
 
 ### FM-Song Tracker
 
-![FM-Song Tracker avec un morceau chargé](images/fmtracker.png)
+![FM-Song Tracker with a tune loaded](images/fmtracker.png)
 
-**FM-Song Tracker** est un *tracker* de musique : on compose en plaçant des notes
-dans une grille. Le son est produit par un synthétiseur **MIDI** (fluidsynth) avec
-une banque d'instruments *General MIDI* — des centaines d'instruments disponibles.
-Il importe aussi les anciens morceaux **`.fms`** du logiciel FM-Song d'origine.
+**FM-Song Tracker** is a music *tracker*: you compose by placing notes in a grid. The
+sound is produced by a **MIDI** synthesizer (fluidsynth) with a *General MIDI*
+instrument bank — hundreds of instruments available. It also imports the original
+FM-Song **`.fms`** tunes.
 
-**Lancer** : depuis le hub **Créer**, via **+ App**, ou en ligne de commande
-`fmtracker mon_morceau.fms`. Le bouton **Open .fms** ouvre un morceau existant.
+**Launch**: from the **Créer** hub, via **+ App**, or on the command line
+`fmtracker my_tune.fms`. The **Open .fms** button opens an existing tune.
 
-**Lire la grille** : chaque **colonne** est un canal (un instrument), chaque **ligne**
-est un pas (le temps qui avance vers le bas).
+**Reading the grid**: each **column** is a channel (an instrument); each **row** is a
+step (time runs downward).
 
-- `----` : case vide (la note précédente continue) ;
-- `===` : silence (arrêt de la note) ;
-- `C-5`, `F#4`… : une note jouée.
+- `----` : empty cell (the previous note keeps sounding);
+- `===` : a rest (the note stops);
+- `C-5`, `F#4`… : a note.
 
-**Saisie au clavier** :
+**Keyboard entry**:
 
-| Touche | Action |
-|--------|--------|
-| `C D E F G A B` | saisir la note correspondante |
-| `+` / `-` | monter / descendre d'une **octave** |
-| `Ctrl`+`+` / `Ctrl`+`-` (ou `Ctrl`+`↑`/`↓`) | transposer la case d'un **demi-ton** |
-| `↑ ↓` | déplacer le curseur dans le temps |
-| `← →` | changer de **canal** |
-| `Espace` | insérer un **silence** |
-| `Suppr` | effacer la case |
+| Key | Action |
+|-----|--------|
+| `C D E F G A B` | enter that note |
+| `+` / `-` | move up / down an **octave** |
+| `Ctrl`+`+` / `Ctrl`+`-` (or `Ctrl`+`↑`/`↓`) | transpose the cell by a **semitone** |
+| `↑ ↓` | move the cursor through time |
+| `← →` | change **channel** |
+| `Space` | insert a **rest** |
+| `Delete` | clear the cell |
 
-**Souris (barre d'outils)** : **▶ Play**, **❚❚ Pause**, **Resume**, **■ Stop** ;
-**+ Channel** / **+ Pattern** ; réglage du **BPM** ; choix du **Pattern** ; choix de
-l'**Instrument** (preset General MIDI) du canal courant.
+**Mouse (toolbar)**: **▶ Play**, **❚❚ Pause**, **Resume**, **■ Stop**; **+ Channel** /
+**+ Pattern**; the **BPM**; the **Pattern** selector; and the **Instrument**
+(General-MIDI preset) of the current channel.
 
-Pendant la lecture, la grille **défile** pour suivre la tête de lecture, et
-**enchaîne les patterns** selon la liste de lecture, en boucle.
-
----
-
-## 10. Raccourcis clavier
-
-`Super` = la touche logo (Windows / ⌘).
-
-| Raccourci | Action |
-|-----------|--------|
-| `Super`+`T` | **+ App** (sélecteur d'applications) |
-| `Super`+`Maj`+`T` | changer le **thème** |
-| `Super`+`Page ↑` / `Page ↓` | agrandir l'écran **principal** / **secondaire** |
-| `Super`+`Entrée` | ouvrir un **terminal** |
-| `Super`+`D` | menu d'applications (fuzzel) |
-| `Super`+`flèches` | changer la fenêtre active |
-| `Super`+`Maj`+`flèches` | déplacer la fenêtre |
-| `Super`+`1`…`9` | aller à une activité |
-| `Super`+`Maj`+`Q` | fermer la fenêtre |
-| `Super`+`Maj`+`C` | recharger Focus DE (Sway) |
+During playback the grid **scrolls** to follow the play-head and **chains patterns**
+according to the order list, looping.
 
 ---
 
-Voir aussi : [installation](install.md) · [présentation du projet](../README.md).
+## 10. Keyboard shortcuts
+
+`Super` = the logo key (Windows / ⌘).
+
+| Shortcut | Action |
+|----------|--------|
+| `Super`+`T` | **+ App** (application picker) |
+| `Super`+`Shift`+`T` | change the **theme** |
+| `Super`+`Page Up` / `Page Down` | maximise the **primary** / **secondary** screen |
+| `Super`+`Enter` | open a **terminal** |
+| `Super`+`D` | application menu (fuzzel) |
+| `Super`+`arrows` | change the focused window |
+| `Super`+`Shift`+`arrows` | move the window |
+| `Super`+`1`…`9` | go to an activity |
+| `Super`+`Shift`+`Q` | close the window |
+| `Super`+`Shift`+`C` | reload Focus DE (Sway) |
+
+---
+
+See also: [installation](install.md) · [project overview](../README.md).

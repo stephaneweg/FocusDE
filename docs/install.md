@@ -1,98 +1,98 @@
 # Focus DE — Installation
 
-Focus DE s'installe **une fois** sur la machine et devient le bureau par défaut de
-**tous** les utilisateurs (y compris ceux créés ensuite).
+Focus DE installs **once** on the machine and becomes the default desktop for **all**
+users (including users created later).
 
-## Prérequis
+## Requirements
 
-- Une distribution **Debian / Ubuntu / Raspberry Pi OS** (testé sur Raspberry Pi 4,
-  arm64). Le paquet est *architecture-indépendante* (`all`).
-- Un accès **root** (`sudo`) et une connexion internet (pour les dépendances).
+- A **Debian / Ubuntu / Raspberry Pi OS** system (tested on a Raspberry Pi 4, arm64).
+  The package is architecture-independent (`all`).
+- **root** access (`sudo`) and an internet connection (for dependencies).
 
-Les dépendances sont tirées automatiquement : Sway, waybar, fuzzel, foot, greetd,
-Python 3 + PyGObject (GTK 3 et 4) + Cairo, fluidsynth + une SoundFont General MIDI,
-ainsi que AbiWord, Gnumeric et Firefox pour les applications hébergées.
+Dependencies are pulled automatically: Sway, waybar, fuzzel, foot, greetd, Python 3 +
+PyGObject (GTK 3 and 4) + Cairo, fluidsynth + a General-MIDI SoundFont, plus AbiWord,
+Gnumeric and Firefox for the hosted applications.
 
-## Installer
+## Install
 
-### Option A — paquet Debian (recommandé)
+### Option A — Debian package (recommended)
 
 ```sh
 sudo apt install ./focusde_0.1.0_all.deb
 ```
 
-`apt` installe Focus DE **et** toutes ses dépendances. Pour fabriquer le paquet
-depuis les sources :
+`apt` installs Focus DE **and** all its dependencies. To build the package from
+source:
 
 ```sh
 ./scripts/build-deb.sh 0.1.0       # -> focusde_0.1.0_all.deb
 ```
 
-### Option B — depuis les sources
+### Option B — from source
 
 ```sh
 git clone https://github.com/stephaneweg/FocusDE
 cd FocusDE
-sudo ./scripts/install-deps.sh     # les prérequis (Sway, GTK, fluidsynth…)
-sudo ./scripts/install.sh --login  # installe Focus DE + active l'écran de connexion
+sudo ./scripts/install-deps.sh     # prerequisites (Sway, GTK, fluidsynth…)
+sudo ./scripts/install.sh --login  # install Focus DE + enable the login screen
 ```
 
-`install.sh` dépose le bureau sur le système et l'installe pour l'utilisateur courant.
-On peut aussi extraire une archive prête à l'emploi :
+`install.sh` lays the desktop onto the system and installs it for the current user.
+You can also extract a ready-made archive:
 
 ```sh
 ./scripts/build-archive.sh                 # -> focusde-rootfs.tar.gz
-sudo tar -C / -xzf focusde-rootfs.tar.gz   # chaque fichier va à sa place
+sudo tar -C / -xzf focusde-rootfs.tar.gz   # every file goes to its place
 ```
 
-## Premier démarrage
+## First boot
 
-Avec l'option `--login`, la machine démarre sur **greetd**, l'écran de connexion :
-saisissez votre identifiant, et la session **Focus DE (Sway)** se lance.
+With `--login`, the machine boots into **greetd**, the login screen: enter your
+username and the **Focus DE (Sway)** session starts.
 
-Sans gestionnaire de connexion, ouvrez une console et lancez simplement :
+Without a login manager, open a console and simply run:
 
 ```sh
 sway
 ```
 
-## Nouveaux utilisateurs
+## New users
 
-La configuration par défaut vit dans `/etc/skel/.config`. Tout compte créé ensuite
-récupère donc **automatiquement** Focus DE :
+The default configuration lives in `/etc/skel/.config`. Any account created
+afterwards therefore gets Focus DE **automatically**:
 
 ```sh
-sudo adduser enfant     # « enfant » obtient le bureau Focus DE au premier login
+sudo adduser kid     # "kid" gets the Focus DE desktop on first login
 ```
 
-Pour appliquer Focus DE à un utilisateur **déjà existant** :
+To apply Focus DE to an **existing** user:
 
 ```sh
 cp -a /etc/skel/.config/. ~/.config/
 ```
 
-## Raspberry Pi sans écran (accès distant)
+## Headless Raspberry Pi (remote access)
 
-Pour piloter le bureau d'un Pi sans moniteur, voir
-[`scripts/setup-remote.sh`](../scripts/setup-remote.sh) : il installe **WayVNC**
-(Sway en mode *headless* + un tunnel SSH) afin de voir et contrôler la session.
+To drive the desktop of a Pi with no monitor, see
+[`scripts/setup-remote.sh`](../scripts/setup-remote.sh): it installs **WayVNC**
+(headless Sway + an SSH tunnel) so you can view and control the session.
 
-## Où les fichiers sont installés
+## Where files are installed
 
-| Emplacement | Contenu |
-|-------------|---------|
-| `/usr/local/lib/focusde/` | le code du shell (+ `apps/fmtracker/`) |
-| `/usr/local/bin/fmtracker` | lanceur du tracker |
-| `/etc/skel/.config/` | configuration par défaut (sway, waybar, onyx, fuzzel) |
-| `/etc/greetd/config.toml` | écran de connexion |
-| `/usr/share/wayland-sessions/focusde.desktop` | session proposée aux gestionnaires de connexion |
+| Location | Contents |
+|----------|----------|
+| `/usr/local/lib/focusde/` | the shell code (+ `apps/fmtracker/`) |
+| `/usr/local/bin/fmtracker` | the tracker launcher |
+| `/etc/skel/.config/` | default configuration (sway, waybar, onyx, fuzzel) |
+| `/etc/greetd/config.toml` | the login screen |
+| `/usr/share/wayland-sessions/focusde.desktop` | session offered to login managers |
 
-## Désinstaller
+## Uninstall
 
 ```sh
-sudo apt remove focusde     # si installé via le .deb
+sudo apt remove focusde     # if installed from the .deb
 ```
 
 ---
 
-Voir aussi : [manuel d'utilisation](user-manual.md) · [présentation](../README.md).
+See also: [user manual](user-manual.md) · [project overview](../README.md).

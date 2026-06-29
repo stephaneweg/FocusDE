@@ -16,6 +16,8 @@ APPLETS = [
      "desc": "Petits calculs", "expand": False},
     {"id": "music", "name": "Musique", "icon": "multimedia-audio-player", "module": "applet_music",
      "desc": "Lecteur des fichiers de ~/Music", "expand": True},
+    {"id": "fmplayer", "name": "FM-Player", "icon": "audio-x-generic", "module": "applet_fmplayer",
+     "desc": "Joue des morceaux FM-Song (.fms) : un fichier ou un dossier", "expand": True},
     {"id": "rappel", "name": "Rappel", "icon": "x-office-calendar", "module": "applet_rappel",
      "desc": "Prochains rendez-vous de l'agenda", "expand": True},
 ]

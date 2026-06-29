@@ -1,64 +1,65 @@
 # Focus DE
 
-> Un bureau Linux **par activités**, pas par fenêtres. Clair, pastel, sans bordures —
-> conçu pour se concentrer, et idéal pour un Raspberry Pi familial.
+> A Linux desktop organised **by activity, not by windows.** Clean, pastel,
+> borderless — built to focus, and ideal for a family Raspberry Pi.
 
-![L'Accueil de Focus DE](docs/images/home.png)
+![Focus DE Home](docs/images/home.png)
 
-Focus DE remplace le « tas de fenêtres » habituel par des **activités** : chaque
-projet occupe tout l'écran, se découpe en zones nettes, et l'**Accueil** vous donne
-la vue d'ensemble. Le tout sur **Sway** (Wayland), avec de **vraies** applications
-Linux hébergées dedans.
+Focus DE replaces the usual "pile of windows" with **activities**: each project fills
+the screen, splits into clear zones, and the **Home** gives you the overview. It runs
+on **Sway** (Wayland) and hosts **real** Linux applications inside.
 
-## Pourquoi Focus DE
+## Why Focus DE
 
-- 🎯 **Une chose à la fois.** Une activité = un contexte plein écran. Fini les
-  trente fenêtres éparpillées.
-- 🧩 **Des zones simples.** Écran principal, écran secondaire, panneau d'applets —
-  et des onglets quand une zone reçoit plusieurs apps.
-- 🗂️ **Des hubs thématiques.** *Travailler, Apprendre, Jouer, Naviguer, Créer* :
-  vos applications rangées par usage, automatiquement.
-- 🔌 **Des applets utiles.** Horloge, Notes, Calculatrice, Musique, Rappels — dans
-  le panneau, à portée de main.
-- 🎹 **Des logiciels intégrés.** Dont **FM-Song Tracker**, un tracker de musique MIDI.
-- 🍓 **Léger.** Pensé pour le Raspberry Pi 4 ; s'installe pour **tous** les
-  utilisateurs en une fois.
+- 🎯 **One thing at a time.** An activity = one full-screen context. No more thirty
+  scattered windows.
+- 🧩 **Simple zones.** A primary screen, a secondary screen, an applet panel — plus
+  tabs when a zone gets several apps.
+- 🗂️ **Thematic hubs.** *Work, Learn, Play, Browse, Create*: your apps sorted by use,
+  automatically.
+- 🔌 **Handy applets.** Clock, Notes, Calculator, Music, FM-Player, Reminders — right
+  in the panel.
+- 🎹 **Built-in software.** Including **FM-Song Tracker**, a MIDI music tracker, and an
+  **FM-Player** applet for `.fms` tunes.
+- 🍓 **Lightweight.** Designed for the Raspberry Pi 4; installs for **all** users at
+  once.
 
-## Le concept en 30 secondes
+## The idea in 30 seconds
 
 | | |
 |---|---|
-| ![Hub Créer](docs/images/hub-creer.png) | **Des hubs** regroupent vos apps par usage. « Créer » réunit les outils de création (dessin, audio…) — et écarte les simples visionneuses. |
-| ![Zones](docs/images/activity-zones.png) | **Une activité, deux écrans** (haut/bas) + un panneau. Les apps multiples deviennent des onglets. |
-| ![Sélecteur d'apps](docs/images/picker.png) | **+ App** : choisissez la zone, puis l'application. Toutes vos apps Linux sont là. |
-| ![Applets](docs/images/applets.png) | **Des applets** dans le panneau : horloge, notes, calculatrice, musique, rappels. |
+| ![Create hub](docs/images/hub-creer.png) | **Hubs** group your apps by use. "Créer" (Create) gathers creation tools (drawing, audio…) — and leaves out plain viewers. |
+| ![Zones](docs/images/activity-zones.png) | **One activity, two screens** (top/bottom) plus a panel. Multiple apps become tabs. |
+| ![App picker](docs/images/picker.png) | **+ App**: pick the zone, then the application. All your Linux apps are there. |
+| ![Applets](docs/images/applets.png) | **Applets** in the panel: clock, notes, calculator, music, FM-Player, reminders. |
 
-## Logiciel intégré : FM-Song Tracker
+## Built-in music: FM-Song Tracker
 
 ![FM-Song Tracker](docs/images/fmtracker.png)
 
-Un **tracker** de musique : on compose en posant des notes dans une grille, jouées
-par un synthé **MIDI** (fluidsynth + SoundFont General MIDI). Il rouvre même les
-anciens morceaux **`.fms`** de FM-Song. Pilotable au clavier (saisie des notes) et à
-la souris (lecture, instruments, patterns).
+A **tracker**: compose by placing notes in a grid, played by a **MIDI** synth
+(fluidsynth + a General-MIDI SoundFont). It even reopens the original FM-Song
+**`.fms`** tunes. Drive it with the keyboard (note entry) and the mouse (transport,
+instruments, patterns). The **FM-Player** applet plays those `.fms` tunes — a single
+file or a whole folder — straight from the panel.
 
-## Installation express
+## Quick install
 
 ```sh
-sudo apt install ./focusde_0.1.0_all.deb     # ou : sudo ./scripts/install.sh --login
+sudo apt install ./focusde_0.1.0_all.deb     # or: sudo ./scripts/install.sh --login
 ```
 
-Tout nouvel utilisateur (`adduser …`) obtient ensuite Focus DE automatiquement.
-Détails → **[Guide d'installation](docs/install.md)**.
+Any new user (`adduser …`) then gets Focus DE automatically.
+Details → **[Installation guide](docs/install.md)**.
 
-## En savoir plus
+## Learn more
 
-- 📖 **[Manuel d'utilisation](docs/user-manual.md)** — activités, zones, apps, applets,
-  FM-Song Tracker, raccourcis.
-- 🛠️ **[Guide d'installation](docs/install.md)**.
-- 🧰 **[Détails techniques du shell](docs/desktop.md)** (pour contribuer).
+- 📖 **[User manual](docs/user-manual.md)** — activities, zones, apps, applets,
+  FM-Song Tracker, shortcuts.
+- 🛠️ **[Installation guide](docs/install.md)**.
+- 🧰 **[Shell internals](docs/desktop.md)** (for contributors).
 
 ---
 
-> **Statut** : en développement. Le bureau et le tracker tournent sur Raspberry Pi 4
-> (Sway/Wayland). Les retours sont les bienvenus.
+> **Status**: in development. The desktop and the tracker run on a Raspberry Pi 4
+> (Sway/Wayland). Feedback welcome.
