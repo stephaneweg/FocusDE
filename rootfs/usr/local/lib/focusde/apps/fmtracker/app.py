@@ -375,14 +375,22 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
 
 
 class FmTrackerApp(Gtk.Application):
-    def __init__(self):
+    def __init__(self, open_file=None):
         super().__init__(application_id=APP_ID)
+        self.open_file = open_file
 
     def do_activate(self):
         win = FmTrackerWindow(self)
+        if self.open_file:
+            win._load_fms(self.open_file)
         win.present()
 
 
 def main(argv=None):
-    app = FmTrackerApp()
-    return app.run(argv)
+    import os
+    import sys
+    argv = argv if argv is not None else sys.argv
+    open_file = next((a for a in argv[1:]
+                      if a.lower().endswith(".fms") and os.path.exists(a)), None)
+    app = FmTrackerApp(open_file=open_file)
+    return app.run([argv[0]])     # don't let GTK parse the .fms path
