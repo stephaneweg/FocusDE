@@ -89,6 +89,7 @@ def recreate_zone(zone, wsid, cid):
         sw("move left"); sw("move left")   # pop hors du tabbed -> splith[gauche, reste]
         sw("[con_id=%d] focus" % cid); sw("split vertical")
         sw("[con_id=%d] resize set width 260 px" % cid)
+        sw("[con_id=%d] border none" % cid)        # applet panel: no border/title
         sw("[con_id=%d] mark %s_%d" % (cid, pref, wsid))
         return
     if zone == "primary":
@@ -138,6 +139,7 @@ def build_home():
     time.sleep(0.4)
     # panneau gauche = UNE fenetre hote empilant les applets (defaut accueil : horloge + notes)
     L = launch_get(["python3", LIBDIR + "/panel_host.py"]); time.sleep(0.6)
+    sw("[con_id=%d] border none" % L)          # applet panel: no border/title (for_window misses GTK)
     sw("[con_id=%d] focus" % L); sw("split horizontal")
     M = launch_get(["python3", LIBDIR + "/home.py"]); time.sleep(0.6)     # zone principale (app accueil)
     sw("[con_id=%d] focus" % L); sw("resize set width 240 px")

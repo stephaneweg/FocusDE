@@ -80,4 +80,6 @@ class Mgr(Gtk.Window):
 pal = focus_theme.for_activity(focus_theme.focused_ws_name())
 prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-w = Mgr(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()
+w = Mgr(); w.connect("destroy", Gtk.main_quit); w.show_all()
+GLib.timeout_add(250, lambda: focus_theme.place_floating("focus-applets", 460, 460) or False)
+Gtk.main()

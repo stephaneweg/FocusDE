@@ -50,4 +50,6 @@ class Switcher(Gtk.Window):
 pal = focus_theme.for_activity(focus_theme.focused_ws_name())
 prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-w = Switcher(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()
+w = Switcher(); w.connect("destroy", Gtk.main_quit); w.show_all()
+GLib.timeout_add(250, lambda: focus_theme.place_floating("focus-switcher", 300, 380, x=12, y=52, borderless=True) or False)
+Gtk.main()

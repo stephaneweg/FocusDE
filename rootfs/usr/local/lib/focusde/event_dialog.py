@@ -95,4 +95,6 @@ class Dlg(Gtk.Window):
 pal = focus_theme.for_activity(focus_theme.focused_ws_name())
 prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS, pal))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-w = Dlg(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()
+w = Dlg(); w.connect("destroy", Gtk.main_quit); w.show_all()
+GLib.timeout_add(250, lambda: focus_theme.place_floating("focus-event-dialog", 440, 560) or False)
+Gtk.main()

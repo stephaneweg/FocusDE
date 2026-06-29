@@ -92,4 +92,6 @@ class ThemeSel(Gtk.Window):
 
 prov = Gtk.CssProvider(); prov.load_from_data(focus_theme.css(CSS_T))
 Gtk.StyleContext.add_provider_for_screen(Gdk.Screen.get_default(), prov, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
-w = ThemeSel(); w.connect("destroy", Gtk.main_quit); w.show_all(); Gtk.main()
+w = ThemeSel(); w.connect("destroy", Gtk.main_quit); w.show_all()
+GLib.timeout_add(250, lambda: focus_theme.place_floating("focus-theme", 840, 600) or False)
+Gtk.main()

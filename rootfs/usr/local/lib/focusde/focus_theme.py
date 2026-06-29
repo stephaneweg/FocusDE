@@ -69,6 +69,17 @@ TILE_COLORS = ["#7C6FE0", "#1D9E75", "#D85A30", "#378ADD", "#2E9E5B", "#C2497E"]
 
 def slug(n): return re.sub(r'[^a-zA-Z0-9]+', '_', n or "").strip('_') or "act"
 
+def place_floating(app_id, w, h, x=None, y=None, borderless=False):
+    # `for_window [app_id=...]` misses at map time for GTK3 (the app_id is published
+    # just after the first map), so a floating tool re-applies its placement itself
+    # once its window is mapped.
+    pos = ("position %d %d" % (x, y)) if x is not None else "position center"
+    bn = "border none, " if borderless else ""
+    subprocess.run(["swaymsg",
+                    '[app_id="%s"] floating enable, %sresize set width %d height %d, move %s'
+                    % (app_id, bn, w, h, pos)],
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
 def current():
     try:
         v = open(CONF + "/theme").read().strip()
