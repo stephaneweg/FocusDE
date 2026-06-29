@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
+import threading
+
 import gi
 
 gi.require_version("Gtk", "4.0")
 gi.require_version("Gdk", "4.0")
 from gi.repository import GLib, Gdk, Gtk      # noqa: E402
 
-from . import fms, gm                          # noqa: E402
+from . import export, fms, gm                  # noqa: E402
 from .gridview import GridView, ROW_H, HEAD_H   # noqa: E402
 from .model import REST, Song, make_midi, midi_to_name   # noqa: E402
 from .sequencer import Sequencer               # noqa: E402
@@ -88,7 +90,8 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
                 g.append(w)
             bar.insert(g, -1)
 
-        group(button("New", self._on_new), button("Open .fms", self._on_open_fms))
+        group(button("New", self._on_new), button("Open .fms", self._on_open_fms),
+              self._export_button())
         group(button("▶ Play", self._on_play), button("❚❚ Pause", self._on_pause),
               button("Resume", self._on_resume), button("■ Stop", self._on_stop))
         group(button("+ Channel", self._on_add_channel),
@@ -107,6 +110,51 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
         self.inst_drop.connect("notify::selected", self._on_instrument_changed)
         group(Gtk.Label(label="Instrument"), self.inst_drop)
         return bar
+
+    def _export_button(self):
+        btn = Gtk.MenuButton(label="Export ▾")
+        btn.set_focusable(False)
+        pop = Gtk.Popover()
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        for m in ("start", "end", "top", "bottom"):
+            getattr(box, f"set_margin_{m}")(6)
+        for label, fmt, ext in (("MIDI (.mid)", "midi", "mid"),
+                                ("WAV (.wav)", "wav", "wav"),
+                                ("MP3 (.mp3)", "mp3", "mp3"),
+                                ("MuseScore (.mscz)", "musescore", "mscz")):
+            b = Gtk.Button(label=label)
+            b.connect("clicked", self._on_export, fmt, ext, pop)
+            box.append(b)
+        pop.set_child(box)
+        btn.set_popover(pop)
+        return btn
+
+    def _on_export(self, _b, fmt, ext, pop):
+        pop.popdown()
+        name = (self.song.title or "song").strip() or "song"
+        dlg = Gtk.FileChooserNative(title="Export %s" % fmt.upper(),
+                                    transient_for=self, action=Gtk.FileChooserAction.SAVE)
+        dlg.set_current_name("%s.%s" % (name, ext))
+        dlg.connect("response", self._on_export_response, fmt)
+        dlg.show()
+        self._export_dialog = dlg
+
+    def _on_export_response(self, dlg, response, fmt):
+        if response == Gtk.ResponseType.ACCEPT:
+            gf = dlg.get_file()
+            if gf:
+                self.status.set_text("Exporting %s…" % fmt.upper())
+                threading.Thread(target=self._do_export, args=(gf.get_path(), fmt),
+                                 daemon=True).start()
+        dlg.destroy()
+        self._export_dialog = None
+
+    def _do_export(self, path, fmt):
+        try:
+            out = export.export(self.song, path, fmt)
+            GLib.idle_add(self.status.set_text, "Exported: " + out)
+        except Exception as exc:                 # noqa: BLE001
+            GLib.idle_add(self.status.set_text, "Export failed (%s): %s" % (fmt, exc))
 
     # -- helpers -------------------------------------------------------------
 

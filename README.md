@@ -39,9 +39,17 @@ on **Sway** (Wayland) and hosts **real** Linux applications inside.
 
 A **tracker**: compose by placing notes in a grid, played by a **MIDI** synth
 (fluidsynth + a General-MIDI SoundFont). It even reopens the original FM-Song
-**`.fms`** tunes. Drive it with the keyboard (note entry) and the mouse (transport,
-instruments, patterns). The **FM-Player** applet plays those `.fms` tunes — a single
-file or a whole folder — straight from the panel.
+**`.fms`** tunes, and **exports** to MIDI / WAV / MP3 / MuseScore. Drive it with the
+keyboard (note entry) and the mouse (transport, instruments, patterns). The
+**FM-Player** applet plays those `.fms` tunes — a single file or a whole folder —
+straight from the panel.
+
+> FM-Song Tracker descends from **FM-Song** by *Asher256*
+> ([github.com/Asher256](https://github.com/Asher256) ·
+> [qbworld.asher256.com](https://qbworld.asher256.com/)), reimagined on MIDI/fluidsynth.
+
+Prefer a different look? A built-in **theme** picker (`Super`+`Shift`+`T`) offers many
+light and dark palettes, applied live — globally or per activity.
 
 ## Quick install
 

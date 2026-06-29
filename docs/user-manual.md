@@ -200,9 +200,39 @@ step (time runs downward).
 During playback the grid **scrolls** to follow the play-head and **chains patterns**
 according to the order list, looping.
 
+**Exporting your music** — the **Export ▾** button writes the song as:
+
+| Format | Notes |
+|--------|-------|
+| **MIDI** (`.mid`) | written natively from the song |
+| **WAV** (`.wav`) | rendered through fluidsynth + the SoundFont |
+| **MP3** (`.mp3`) | re-encoded with `ffmpeg` |
+| **MuseScore** (`.mscz`) | converted with the `mscore` CLI — the `.mid` also opens directly in MuseScore |
+
+> FM-Song Tracker descends from **FM-Song** by *Asher256*, a QuickBASIC AdLib/OPL
+> tracker ([github.com/Asher256](https://github.com/Asher256) ·
+> [qbworld.asher256.com](https://qbworld.asher256.com/)). This is a modern
+> reimagining (MIDI / fluidsynth) that still opens the original `.fms` tunes.
+
 ---
 
-## 10. Keyboard shortcuts
+## 10. Themes
+
+![Choosing a theme](images/theme-picker.png)
+
+Press `Super`+`Shift`+`T` to open **Choisir un thème** (Choose a theme). Pick from a
+palette of light and dark themes (Lavande, Océan, Forêt, Nuit, Encre…); the change
+is applied **live**.
+
+The **Partout** / **Cette activité** toggle sets the scope:
+
+- **Partout** (Everywhere) — the default theme for the whole desktop;
+- **Cette activité** (This activity) — a colour just for the current activity, so
+  each activity can look distinct.
+
+---
+
+## 11. Keyboard shortcuts
 
 `Super` = the logo key (Windows / ⌘).
 

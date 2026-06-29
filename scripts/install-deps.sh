@@ -14,7 +14,7 @@ if command -v apt-get >/dev/null 2>&1; then
     sudo apt-get install -y \
         sway waybar fuzzel foot greetd \
         python3 python3-gi python3-gi-cairo gir1.2-gtk-3.0 gir1.2-gtk-4.0 \
-        fluidsynth fluid-soundfont-gm \
+        fluidsynth fluid-soundfont-gm ffmpeg \
         abiword gnumeric firefox-esr
     echo "    (optional nicer login screen:  sudo apt-get install -y tuigreet)"
 else
