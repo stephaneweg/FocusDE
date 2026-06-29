@@ -1,0 +1,29 @@
+{
+  "border": "pixel",
+  "layout": "splitv",
+  "type": "con",
+  "nodes": [
+    {
+      "border": "pixel",
+      "layout": "tabbed",
+      "type": "con",
+      "percent": 0.68,
+      "marks": ["Z_primary"],
+      "nodes": [
+        { "border": "pixel", "type": "con", "name": "AbiWord",  "swallows": [ { "app_id": "^abiword$" } ] },
+        { "border": "pixel", "type": "con", "name": "Gnumeric", "swallows": [ { "app_id": "^gnumeric$" } ] }
+      ]
+    },
+    {
+      "border": "pixel",
+      "layout": "tabbed",
+      "type": "con",
+      "percent": 0.32,
+      "marks": ["Z_secondary"],
+      "nodes": [
+        { "border": "pixel", "type": "con", "name": "Terminal 1", "swallows": [ { "app_id": "^foot$" } ] },
+        { "border": "pixel", "type": "con", "name": "Terminal 2", "swallows": [ { "app_id": "^foot$" } ] }
+      ]
+    }
+  ]
+}

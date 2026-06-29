@@ -1,0 +1,11 @@
+{
+  "layer": "top", "position": "top", "height": 46,
+  "modules-left": ["custom/activity"],
+  "modules-center": [],
+  "modules-right": ["custom/add", "custom/panel", "custom/home", "clock"],
+  "custom/activity": { "exec": "/home/maison/.config/waybar/activity-name.sh", "interval": 1, "on-click": "python3 /home/maison/activity_switcher.py", "tooltip": false },
+  "custom/add":    { "exec": "/home/maison/.config/waybar/add-btn.sh",    "interval": 1, "on-click": "python3 /home/maison/picker.py", "tooltip": false },
+  "custom/panel":  { "exec": "/home/maison/.config/waybar/panel-btn.sh",  "interval": 1, "on-click": "python3 /home/maison/panel_toggle.py", "tooltip": false },
+  "custom/home":   { "exec": "/home/maison/.config/waybar/home-btn.sh",   "interval": 1, "on-click": "/home/maison/go_home.sh", "tooltip": false },
+  "clock": { "format": "{:%H:%M}" }
+}

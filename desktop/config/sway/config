@@ -1,0 +1,60 @@
+# Onyx activity-shell -- config etape 2 : theme pastel (onglets = couleur du fond)
+include /etc/sway/config
+
+### Palette pastel Onyx
+set $bg        #F3F1FA
+set $tab_on    #DCD3F2
+set $tab_off   #F3F1FA
+set $ink       #4B3FA0
+set $ink_soft  #8A86A0
+set $line      #E4DEF3
+set $border_on #C9BEEA
+set $urg_bg    #F6E2E9
+set $urg_ink   #993556
+
+### Fond pastel
+output * bg $bg solid_color
+
+### Look : espaces, bordures fines, police
+gaps inner 12
+gaps outer 12
+default_border pixel 2
+default_floating_border pixel 2
+default_orientation vertical
+title_align center
+font pango:Sans 10
+
+### Couleurs des barres de titre / onglets
+#                       bordure  fond_barre  texte      indicateur  bord_fenetre
+client.focused          $border_on $tab_on   $ink       $tab_on     $border_on
+client.focused_inactive $line    $tab_off    $ink_soft  $tab_off    $line
+client.unfocused        $line    $tab_off    $ink_soft  $tab_off    $line
+client.urgent           $urg_bg  $urg_bg     $urg_ink   $urg_bg     $urg_bg
+
+### Activites : le "+" ouvre le selecteur d'apps (souris) avec choix de zone
+show_marks no
+bindsym $mod+t exec python3 /home/maison/picker.py
+for_window [app_id="onyx-picker"] floating enable, resize set width 780 height 560, move position center
+bindsym $mod+Shift+t exec python3 /home/maison/theme.py
+for_window [app_id="onyx-theme"] floating enable, resize set width 840 height 600, move position center
+for_window [app_id="onyx-applets"] floating enable, resize set width 460 height 460, move position center
+for_window [app_id="onyx-note-dialog"] floating enable, resize set width 520 height 540, move position center
+for_window [app_id="onyx-event-dialog"] floating enable, resize set width 440 height 560, move position center
+### Panneau gauche (hote d'applets) : sans bordure
+for_window [app_id="onyx-panel"] border none
+### Selecteur d'activites (clic sur le titre) : flottant en haut a gauche
+for_window [app_id="onyx-switcher"] floating enable, border none, resize set width 300 height 380, move position 12 52
+### Agrandir/restaurer une zone (bascule vers 2/3-1/3)
+bindsym $mod+Prior exec python3 /home/maison/zone_max.py primary
+bindsym $mod+Next exec python3 /home/maison/zone_max.py secondary
+
+### Bandeau global + clavier = layout systeme (/etc/default/keyboard) + masquer swaybar
+exec_always sh -c 'sleep 2; swaymsg bar bar-0 mode invisible; L=$(. /etc/default/keyboard 2>/dev/null; echo "${XKBLAYOUT:-fr}"); swaymsg input type:keyboard xkb_layout "$L"; python3 /home/maison/theme_apply.py --swayonly'
+exec waybar
+
+### Services (au demarrage initial seulement)
+exec wayvnc 0.0.0.0 5900
+### Construire l'ecran d'accueil au boot (robuste : attend sway pret + retry)
+exec /home/maison/focus_boot.sh
+### Theme par activite (applique la palette de l'activite au changement)
+exec python3 /home/maison/theme_daemon.py
