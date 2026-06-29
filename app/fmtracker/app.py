@@ -264,6 +264,14 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
             return False
         col, row = self.grid.cursor_col, self.grid.cursor_row
         lower = name.lower()
+        ctrl = bool(state & Gdk.ModifierType.CONTROL_MASK)
+
+        # Ctrl + (Up/Down or +/-) : transpose the current cell by a semitone.
+        if ctrl and name in ("Up", "Down", "plus", "minus",
+                             "KP_Add", "KP_Subtract", "equal"):
+            up = name in ("Up", "plus", "KP_Add", "equal")
+            self._transpose_cell(+1 if up else -1)
+            return True
 
         if name in ("Up", "Down", "Left", "Right"):
             if name == "Up":
@@ -289,18 +297,12 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
             self._update_status()
             return True
 
-        if name in ("numbersign", "asterisk"):          # '#' / '*' : sharpen
-            self._transpose_cell(+1)
-            return True
-        if name == "slash":                              # '/' : flatten (b is the B note)
-            self._transpose_cell(-1)
-            return True
-        if name in ("plus", "KP_Add", "equal"):
+        if name in ("plus", "KP_Add", "equal"):          # octave up (no Ctrl)
             self.edit_octave = min(8, self.edit_octave + 1)
             self._transpose_cell(+12, only_if_note=True)
             self._update_status()
             return True
-        if name in ("minus", "KP_Subtract"):
+        if name in ("minus", "KP_Subtract"):             # octave down (no Ctrl)
             self.edit_octave = max(0, self.edit_octave - 1)
             self._transpose_cell(-12, only_if_note=True)
             self._update_status()
