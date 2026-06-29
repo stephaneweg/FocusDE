@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Editor / OS
+*.swp
+.DS_Store
+
+# Local soundfonts / audio dumps (large binaries — install via apt)
+*.sf2
+*.wav
