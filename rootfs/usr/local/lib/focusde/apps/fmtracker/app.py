@@ -121,7 +121,7 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
         for label, fmt, ext in (("MIDI (.mid)", "midi", "mid"),
                                 ("WAV (.wav)", "wav", "wav"),
                                 ("MP3 (.mp3)", "mp3", "mp3"),
-                                ("MuseScore (.mscz)", "musescore", "mscz")):
+                                ("MuseScore (.mscx)", "musescore", "mscx")):
             b = Gtk.Button(label=label)
             b.connect("clicked", self._on_export, fmt, ext, pop)
             box.append(b)

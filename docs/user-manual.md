@@ -207,7 +207,7 @@ according to the order list, looping.
 | **MIDI** (`.mid`) | written natively from the song |
 | **WAV** (`.wav`) | rendered through fluidsynth + the SoundFont |
 | **MP3** (`.mp3`) | re-encoded with `ffmpeg` |
-| **MuseScore** (`.mscz`) | converted with the `mscore` CLI — the `.mid` also opens directly in MuseScore |
+| **MuseScore** (`.mscx`) | a native MuseScore-3 score (one staff per track, clef chosen from its range); opens in MuseScore 3/4 — no MuseScore needed to export |
 
 > FM-Song Tracker descends from **FM-Song** by *Asher256*, a QuickBASIC AdLib/OPL
 > tracker ([github.com/Asher256](https://github.com/Asher256) ·
