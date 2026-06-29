@@ -14,7 +14,7 @@ CATMAP = {
     "Travailler": ["Office", "Finance", "WordProcessor", "Spreadsheet"],
     "Apprendre":  ["Education"],
     "Jouer":      ["Game"],
-    "Créer":      ["Graphics"],
+    "Créer":      ["Graphics", "AudioVideo", "Audio", "Music"],
 }
 
 def slug(name): return re.sub(r'[^a-zA-Z0-9]+', '_', name).strip('_') or "act"

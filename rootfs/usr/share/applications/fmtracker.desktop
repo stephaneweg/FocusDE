@@ -4,4 +4,6 @@ Name=FM-Song Tracker
 Comment=MIDI music tracker (fluidsynth)
 Exec=fmtracker
 Terminal=false
+Icon=multimedia-audio-player
 Categories=AudioVideo;Audio;Music;
+Keywords=tracker;midi;music;fmsong;
