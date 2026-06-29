@@ -38,6 +38,7 @@ class GridView(Gtk.DrawingArea):
         self.playhead_pattern = -1
         self.on_cell_clicked = on_cell_clicked
 
+        self.set_focusable(True)        # take keyboard focus (note entry lives here)
         self.set_draw_func(self._draw)
         click = Gtk.GestureClick()
         click.connect("pressed", self._on_pressed)
@@ -74,6 +75,7 @@ class GridView(Gtk.DrawingArea):
     # -- input ---------------------------------------------------------------
 
     def _on_pressed(self, gesture, n_press, x, y):
+        self.grab_focus()               # clicking the grid returns key focus to it
         pat = self.pattern
         if not pat:
             return

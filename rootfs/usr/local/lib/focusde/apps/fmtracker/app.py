@@ -9,7 +9,7 @@ gi.require_version("Gdk", "4.0")
 from gi.repository import GLib, Gdk, Gtk      # noqa: E402
 
 from . import fms, gm                          # noqa: E402
-from .gridview import GridView                 # noqa: E402
+from .gridview import GridView, ROW_H, HEAD_H   # noqa: E402
 from .model import REST, Song, make_midi, midi_to_name   # noqa: E402
 from .sequencer import Sequencer               # noqa: E402
 from .synth import Synth                       # noqa: E402
@@ -38,11 +38,11 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
 
         self.grid = GridView(on_cell_clicked=self._on_cell_clicked)
         self.grid.set_song(self.song)
-        scroller = Gtk.ScrolledWindow()
-        scroller.set_vexpand(True)
-        scroller.set_hexpand(True)
-        scroller.set_child(self.grid)
-        root.append(scroller)
+        self.scroller = Gtk.ScrolledWindow()
+        self.scroller.set_vexpand(True)
+        self.scroller.set_hexpand(True)
+        self.scroller.set_child(self.grid)
+        root.append(self.scroller)
 
         self.status = Gtk.Label(xalign=0)
         self.status.set_margin_start(8)
@@ -50,9 +50,12 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
         self.status.set_margin_bottom(4)
         root.append(self.status)
 
+        # Keys go to the grid, so toolbar buttons never steal Space/Enter; the
+        # grid grabs focus when shown and on click.
         keys = Gtk.EventControllerKey()
         keys.connect("key-pressed", self._on_key)
-        self.add_controller(keys)
+        self.grid.add_controller(keys)
+        self.grid.connect("map", lambda *_: self.grid.grab_focus())
 
         self.connect("close-request", self._on_close)
         self._refresh_patterns()
@@ -62,43 +65,47 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
     # -- UI construction -----------------------------------------------------
 
     def _build_toolbar(self):
-        bar = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
+        # FlowBox so the controls wrap onto several rows on a narrow screen.
+        bar = Gtk.FlowBox()
+        bar.set_selection_mode(Gtk.SelectionMode.NONE)
+        bar.set_max_children_per_line(30)
+        bar.set_min_children_per_line(1)
+        bar.set_column_spacing(6)
+        bar.set_row_spacing(4)
+        bar.set_homogeneous(False)
         for m in ("start", "end", "top", "bottom"):
             getattr(bar, f"set_margin_{m}")(6)
 
         def button(label, cb):
             b = Gtk.Button(label=label)
+            b.set_focusable(False)          # never steal Space/Enter from the grid
             b.connect("clicked", cb)
-            bar.append(b)
             return b
 
-        button("New", self._on_new)
-        button("Open .fms", self._on_open_fms)
-        bar.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL))
-        button("▶ Play", self._on_play)
-        button("❚❚ Pause", self._on_pause)
-        button("Resume", self._on_resume)
-        button("■ Stop", self._on_stop)
-        bar.append(Gtk.Separator(orientation=Gtk.Orientation.VERTICAL))
-        button("+ Channel", self._on_add_channel)
-        button("+ Pattern", self._on_add_pattern)
+        def group(*widgets):
+            g = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
+            for w in widgets:
+                g.append(w)
+            bar.insert(g, -1)
 
-        bar.append(Gtk.Label(label="  BPM"))
+        group(button("New", self._on_new), button("Open .fms", self._on_open_fms))
+        group(button("▶ Play", self._on_play), button("❚❚ Pause", self._on_pause),
+              button("Resume", self._on_resume), button("■ Stop", self._on_stop))
+        group(button("+ Channel", self._on_add_channel),
+              button("+ Pattern", self._on_add_pattern))
+
         self.bpm_spin = Gtk.SpinButton.new_with_range(20, 400, 1)
         self.bpm_spin.set_value(self.song.bpm)
         self.bpm_spin.connect("value-changed", self._on_bpm)
-        bar.append(self.bpm_spin)
+        group(Gtk.Label(label="BPM"), self.bpm_spin)
 
-        bar.append(Gtk.Label(label="  Pattern"))
         self.pattern_drop = Gtk.DropDown.new_from_strings(["Pattern 1"])
         self.pattern_drop.connect("notify::selected", self._on_pattern_changed)
-        bar.append(self.pattern_drop)
+        group(Gtk.Label(label="Pattern"), self.pattern_drop)
 
-        bar.append(Gtk.Label(label="  Instrument"))
         self.inst_drop = Gtk.DropDown.new_from_strings(gm.GM_NAMES)
-        self.inst_drop.set_hexpand(True)
         self.inst_drop.connect("notify::selected", self._on_instrument_changed)
-        bar.append(self.inst_drop)
+        group(Gtk.Label(label="Instrument"), self.inst_drop)
         return bar
 
     # -- helpers -------------------------------------------------------------
@@ -135,6 +142,20 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
         if pat and self.grid.cursor_row < pat.rows - 1:
             self.grid.cursor_row += 1
 
+    def _ensure_row_visible(self, row):
+        adj = self.scroller.get_vadjustment()
+        if adj is None:
+            return
+        page = adj.get_page_size()
+        if page <= 0:
+            return
+        y = HEAD_H + row * ROW_H
+        top = adj.get_value()
+        if y < top:
+            adj.set_value(max(0, y))
+        elif y + ROW_H > top + page:
+            adj.set_value(min(adj.get_upper() - page, y + ROW_H - page))
+
     def _preview(self, midi):
         if self.seq.playing or not self.song.channels:
             return
@@ -165,8 +186,14 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
         GLib.idle_add(self._on_row, order_index, pattern_index, row)
 
     def _on_row(self, order_index, pattern_index, row):
+        # follow the song across patterns, and keep the playhead in view
+        if pattern_index != self.grid.pattern_index:
+            self.grid.pattern_index = pattern_index
+            self._refresh_patterns()
+            self.grid.refresh()
         self.grid.playhead_pattern = pattern_index
         self.grid.playhead_row = row
+        self._ensure_row_visible(row)
         self.grid.queue_draw()
         return False
 
@@ -215,6 +242,7 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
 
     def _on_cell_clicked(self, col, row):
         self._sync_instrument()
+        self._ensure_row_visible(row)
         self._update_status()
 
     def _on_open_fms(self, *_):
@@ -285,6 +313,7 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
                 self.grid.cursor_col = min(len(self.song.channels) - 1, col + 1)
             self._sync_octave_from_cell()
             self._sync_instrument()
+            self._ensure_row_visible(self.grid.cursor_row)
             self.grid.queue_draw()
             self._update_status()
             return True
@@ -294,6 +323,7 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
             pat.data[col][row] = midi
             self._preview(midi)
             self._advance_row()
+            self._ensure_row_visible(self.grid.cursor_row)
             self.grid.queue_draw()
             self._update_status()
             return True
@@ -311,6 +341,7 @@ class FmTrackerWindow(Gtk.ApplicationWindow):
         if name == "space":
             pat.data[col][row] = REST
             self._advance_row()
+            self._ensure_row_visible(self.grid.cursor_row)
             self.grid.queue_draw()
             return True
         if name in ("Delete", "BackSpace"):
