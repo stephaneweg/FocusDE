@@ -5,5 +5,5 @@ Comment=MIDI music tracker (fluidsynth)
 Exec=fmtracker
 Terminal=false
 Icon=multimedia-audio-player
-Categories=AudioVideo;Audio;Music;
+Categories=AudioVideo;Audio;Music;Sequencer;Midi;
 Keywords=tracker;midi;music;fmsong;

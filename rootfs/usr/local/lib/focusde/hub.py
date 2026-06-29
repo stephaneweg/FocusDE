@@ -14,8 +14,16 @@ CATMAP = {
     "Travailler": ["Office", "Finance", "WordProcessor", "Spreadsheet"],
     "Apprendre":  ["Education"],
     "Jouer":      ["Game"],
-    "Créer":      ["Graphics", "AudioVideo", "Audio", "Music"],
+    # Création = graphisme + audio/musique. On inclut les catégories d'AUTORING
+    # freedesktop (pas juste les principales)…
+    "Créer":      ["Graphics", "2DGraphics", "RasterGraphics", "VectorGraphics",
+                   "3DGraphics", "Photography", "Publishing", "Art",
+                   "AudioVideo", "Audio", "Music", "AudioVideoEditing",
+                   "Sequencer", "Midi", "Recorder", "Mixer"],
 }
+# …et on EXCLUT les fonctions de consommation : un visualiseur/lecteur n'est pas
+# un outil de création (freedesktop les marque "Viewer"/"Player").
+CATEXCLUDE = {"Créer": {"Viewer", "Player"}}
 
 def slug(name): return re.sub(r'[^a-zA-Z0-9]+', '_', name).strip('_') or "act"
 def hub_file(name): return os.path.expanduser("~/.config/onyx/hubs/%s.list" % slug(name))
@@ -40,12 +48,13 @@ def parse(path):
             "icon": icon or "application-x-executable",
             "cats": set(c for c in cats.split(";") if c)}
 
-def apps_for(cats):
-    want = set(cats); seen = set(); out = []
+def apps_for(cat):
+    want = set(CATMAP.get(cat, [])); block = CATEXCLUDE.get(cat, set())
+    seen = set(); out = []
     for d in ["/usr/share/applications", os.path.expanduser("~/.local/share/applications")]:
         for p in glob.glob(d + "/*.desktop"):
             a = parse(p)
-            if a and (a["cats"] & want) and a["name"] not in seen:
+            if a and (a["cats"] & want) and not (a["cats"] & block) and a["name"] not in seen:
                 seen.add(a["name"]); out.append(a)
     out.sort(key=lambda a: a["name"].lower()); return out
 
@@ -89,7 +98,7 @@ class Hub(Gtk.Window):
 
     def get_apps(self):
         if self.custom_name is not None: return custom_apps(self.custom_name)
-        return apps_for(CATMAP.get(self.cat, []))
+        return apps_for(self.cat)
 
     def refresh(self):
         for c in self.flow.get_children(): self.flow.remove(c)
