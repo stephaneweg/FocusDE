@@ -12,6 +12,10 @@ mkdir -p "$STAGE"
 cp -a "$HERE/rootfs/." "$STAGE/"
 find "$STAGE" -name '__pycache__' -type d -prune -exec rm -rf {} + 2>/dev/null || true
 
+# Keep scripts LF — a stray CRLF breaks the shells.
+find "$STAGE" -name '*.sh' -exec sed -i 's/\r$//' {} + 2>/dev/null || true
+sed -i 's/\r$//' "$STAGE/usr/local/bin/fmtracker" 2>/dev/null || true
+
 # Normalise permissions (source may be a Windows/exFAT checkout where all is 0777).
 find "$STAGE" -type d -exec chmod 0755 {} +
 find "$STAGE" -type f -exec chmod 0644 {} +

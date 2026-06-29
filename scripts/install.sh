@@ -21,6 +21,9 @@ USER_HOME="$(getent passwd "$USER_NAME" | cut -d: -f6)"
 echo "==> Laying payload onto /"
 cp -a "$HERE/rootfs/." /
 chmod +x /usr/local/bin/fmtracker /usr/local/lib/focusde/*.sh 2>/dev/null || true
+# Keep shipped scripts LF — a stray CRLF breaks the shells (`if … fi`).
+find /usr/local/lib/focusde /etc/skel -name '*.sh' -exec sed -i 's/\r$//' {} + 2>/dev/null || true
+sed -i 's/\r$//' /usr/local/bin/fmtracker 2>/dev/null || true
 
 if [ -n "$USER_HOME" ] && [ -d "$USER_HOME" ]; then
     echo "==> Seeding config for current user '$USER_NAME' -> $USER_HOME/.config"
