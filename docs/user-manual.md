@@ -65,17 +65,57 @@ The Home is your starting point (click **Accueil** in the bar at any time). It s
 
 ## 4. Activities
 
-**Create an activity** — click the **+ Nouvelle activité** tile and give it a name. It
-opens ready to be filled with applications, with the applet panel on the left.
+### 4.1 Create a new activity — step by step
 
-**Switch activities** — click its tile from the Home, or click the **activity name on
-the left of the top bar** to open a quick switcher and pick another one. (Under the
-hood each activity is a Sway workspace; `Super`+`1`…`9` also works.)
+Let's build an activity to write a report with the browser open beside it.
 
-**Stop an activity** — click the red **✕** on the right of the bar. A confirmation
-appears (*all the activity's windows will be closed*); confirm and Focus DE closes
-every window of the activity, frees its memory, and returns you to the Home. Use this
-when you are done with a context and want to reclaim resources.
+**1. Start a new activity.** On the Home, click the **+ Nouvelle activité** tile. A
+small dialog asks for a name.
+
+![The new-activity dialog](images/new-activity-dialog.png)
+
+**2. Name it.** Type a name (e.g. *Exposé volcans*) and click **Créer**. The activity
+opens, **empty**: just the applet panel on the left and a blank main area waiting for
+your first application.
+
+![A freshly created, empty activity](images/activity-empty.png)
+
+**3. Add the main task (primary zone).** Click **+ App** in the top bar. In the picker,
+choose **Principal**, then pick your application — for a report, **AbiWord**. It opens
+in the **primary** zone, filling the left ~2/3 of the screen.
+
+![The activity with AbiWord in the primary zone](images/activity-primary.png)
+
+**4. Add a secondary task (secondary zone).** Click **+ App** again, choose
+**Secondaire**, and pick a second application — say **Firefox** to look things up, or a
+terminal. It docks on the **right**, taking ~1/3 of the width, next to AbiWord.
+
+![AbiWord on the left, a second app on the right](images/activity-secondary.png)
+
+**5. Keep going.** From here you can:
+
+- **Add more apps to a zone** — they stack as **tabs** at the top of that zone (e.g. a
+  second document in the primary). Click a tab, or `Super`+arrows, to switch.
+- **Give the report more room** — click **Secondaire** to collapse the right zone
+  (AbiWord then fills the whole width); click it again to bring the browser back. Or
+  use `Super`+`Page Up` / `Page Down` to grow one side.
+- **Pin handy tools** — add applets (Notes, Calculator…) to the left panel (§8).
+
+Your activity now lives in the bar's switcher and as a tile on the Home; come back to
+it any time.
+
+### 4.2 Switch activities
+
+Click its tile from the Home, or click the **activity name on the left of the top bar**
+to open a quick switcher and pick another one. (Under the hood each activity is a Sway
+workspace; `Super`+`1`…`9` also works.)
+
+### 4.3 Stop an activity
+
+Click the red **✕** on the right of the bar. A confirmation appears (*all the
+activity's windows will be closed*); confirm and Focus DE closes every window of the
+activity, frees its memory, and returns you to the Home. Use this when you are done
+with a context and want to reclaim resources.
 
 ---
 
@@ -150,34 +190,80 @@ You can also **pin** any application into a hub from the picker (**+ App** → t
 
 ## 8. Applets (left panel)
 
+The left panel hosts **applets**: small utility tiles stacked vertically. They live
+*beside* your applications, so a clock, a calculator or your notes stay visible while
+you work.
+
+**Choosing applets.** Click the **+** at the top of the panel ("Applets") to open the
+applet manager, tick the ones you want, then **Appliquer** (Apply).
+
 ![The applet manager](images/applets.png)
 
-The left panel hosts **applets**. Click the **+** at the top of the panel
-("Applets") to choose which ones to show, then **Appliquer** (Apply). The selection is
-remembered **per activity**.
+The selection is remembered **per activity** — each activity can show a different set
+(the Home shows Clock + Notes by default). The **Panneau** button in the bar shows or
+hides the whole panel.
 
-| Applet | Description | Usage |
-|--------|-------------|-------|
-| **Horloge** (Clock) | Time and date | simple display |
-| **Notes** | Activity notes (or *everywhere* from the Home) | **+ Nouvelle** to add; the **eye** shows a note, the **trash** deletes it |
-| **Calculatrice** (Calculator) | Quick sums | calculations without leaving the activity |
-| **Musique** (Music) | Plays files from `~/Music` | listen to your music (MP3/OGG/FLAC…) |
-| **FM-Player** | Plays FM-Song `.fms` tunes | a single file or a whole folder — see below |
-| **Rappel** (Reminder) | Upcoming agenda events | click an event or **+ RDV** to open the **Agenda** in a floating window (with a **Fermer** button) |
+Six applets are available:
 
-The **Panneau** button in the bar shows/hides the panel.
+### 8.1 Horloge (Clock)
 
-### The FM-Player applet
+A large **time** (HH:MM) and the **date** in French (e.g. *Mardi 30 juin*), updated
+every second. Display only — a calm anchor at the top of the panel.
+
+### 8.2 Notes
+
+A per-activity notepad. The sub-title shows the **scope**: **Cette activité** (notes
+attached to this activity) inside an activity, or **Partout** (global notes) on the
+Home.
+
+- **+ Nouvelle** opens an editor to write a note (a title and a body).
+- Each note appears as a row; the **eye** icon reopens it to read/edit, the **trash**
+  icon deletes it.
+- The list refreshes by itself when a note changes.
+
+Notes are saved on disk per activity, so they come back the next time you open it.
+
+### 8.3 Calculatrice (Calculator)
+
+A pocket calculator with a display and a keypad: digits and `.`, the operators
+`÷ × − +`, **%** (percent), **C** (clear), **←** (backspace) and **=**. It evaluates
+the expression safely; a malformed entry shows **Erreur**. Handy for a quick sum
+without leaving the activity.
+
+### 8.4 Musique (Music)
+
+A simple player for your own files in **`~/Music`** (MP3, OGG, FLAC, WAV, M4A, OPUS,
+AAC), powered by GStreamer.
+
+- The **track list** shows every file found; click one to play it.
+- Transport: **previous / play–pause / next**; the current track is highlighted and
+  named at the top.
+- It **auto-advances** to the next track when one ends.
+- Empty? It tells you to drop files into `~/Music`.
+
+### 8.5 FM-Player
 
 ![The FM-Player applet in the panel](images/applet-fmplayer.png)
 
-FM-Player plays **FM-Song `.fms`** tunes right in the panel, using the FM-Song
-Tracker engine (fluidsynth + a General-MIDI SoundFont):
+Plays **FM-Song `.fms`** tunes right in the panel, using the FM-Song Tracker engine
+(fluidsynth + a General-MIDI SoundFont — see §9).
 
-- **Dossier** (Folder) loads a whole folder as a playlist; **Fichier** (File) loads a
-  single tune. By default it scans `~/fms` (then `~/Music`).
-- Transport: previous / **play–pause** / stop / next. Click a tune in the list to
-  play it; the player auto-advances to the next when one finishes.
+- **Fichier** (File) loads a single tune; **Dossier** (Folder) loads a whole folder as
+  a playlist. By default it scans `~/fms` (then `~/Music`).
+- Transport: **previous / play–pause / stop / next**; click a tune in the list to play
+  it. The player **auto-advances** to the next when one finishes.
+
+### 8.6 Rappel (Reminder)
+
+Shows your **next agenda appointments** (up to six), grouped by day with the French
+date. It refreshes automatically when the agenda changes.
+
+- **+ RDV** opens the **Agenda** (a floating window, with a **Fermer** = Close button)
+  and a dialog to add a new appointment.
+- Clicking an existing event opens the Agenda on it to edit it.
+
+The agenda is shared with this applet, so anything you add in one shows up in the
+other.
 
 ---
 
