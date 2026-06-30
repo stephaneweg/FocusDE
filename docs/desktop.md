@@ -119,10 +119,16 @@ fuzzel in `…/.config/fuzzel/fuzzel.ini`.
 `applet_rappel.py`, `applet_fmplayer.py` (plays `.fms` via the fmtracker engine).
 Per-activity applet selection in `…/.config/focus/applets/<slug>`.
 
-**Theme** — `focus_theme.py` (the built-in palettes + helpers), `theme.py` (the
-picker, `$mod+Shift+t`), `theme_apply.py`, `theme_daemon.py` (subscribes to Sway
-`workspace` events and re-applies the **per-activity** palette to Sway + waybar on each
-switch, without a restart). Choices in `…/.config/focus/{theme,themes/<slug>}`.
+**Theme** — `focus_theme.py` (palette loader + helpers), `theme.py` (the picker,
+`$mod+Shift+t`), `theme_apply.py`, `theme_daemon.py` (subscribes to Sway `workspace`
+events and re-applies the **per-activity** palette to Sway + waybar on each switch,
+without a restart). Palettes are **data**: `focus_theme` loads them from
+`themes.json` (system: next to the code; user: `~/.config/focus/themes.json`, which
+overlays the system file), keyed by colour name, with the hard-coded `_DEFAULT_PALETTES`
+only as a fallback — so themes can be added/edited without touching the code. The
+chosen theme(s) are stored in `…/.config/focus/{theme,themes/<slug>}`. The doc palette
+strips come from [`tools/gen_palettes.py`](../tools/gen_palettes.py), which reads the
+same definitions.
 
 **Agenda / notes** — `agenda.py` (floating agenda window), `event_dialog.py`,
 `note_dialog.py`; data in `…/.config/focus/{agenda.json,notes/<scope>.json}`.

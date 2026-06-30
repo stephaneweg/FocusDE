@@ -382,6 +382,35 @@ ink · avatar**.
 > [`tools/gen_palettes.py`](../tools/gen_palettes.py) — re-run it if the palettes
 > change.
 
+### Create or edit a theme
+
+Themes are **plain data**, not code — you can add or tweak one without any tools or
+root access. Create the file **`~/.config/focus/themes.json`** and describe your
+palettes:
+
+```json
+{
+  "order": ["Mon thème", "Lavande", "Océan"],
+  "palettes": {
+    "Mon thème": {
+      "bg": "#101014", "surface": "#1B1B22", "ink": "#ECECF2", "ink_soft": "#9A9AA8",
+      "border": "#33333E", "accent": "#2E2E48", "accent_strong": "#4A4A78",
+      "accent_ink": "#9D8CFF", "avatar": "#7C6FE0"
+    }
+  }
+}
+```
+
+- **`palettes`** — your themes. Each colour key is optional; anything you omit falls
+  back to the *Lavande* value, so you can change just one or two colours.
+- **`order`** — the order they appear in the picker (names you leave out are appended).
+- A theme with an existing name **overrides** the built-in one of that name.
+
+Save the file and open the theme picker (`Super`+`Shift`+`T`) — your theme is there,
+ready to apply. (Colours are the usual `#RRGGBB` hex. The shipped themes live the same
+way in `/usr/local/lib/focusde/themes.json`; a broken or missing file is simply
+ignored, so the desktop always has themes.)
+
 ---
 
 ## 11. Keyboard shortcuts

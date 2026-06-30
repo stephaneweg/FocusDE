@@ -3,7 +3,7 @@
 import os, re, subprocess
 CONF = os.path.expanduser("~/.config/focus")
 
-PALETTES = {
+_DEFAULT_PALETTES = {
     "Lavande": dict(bg="#F3F1FA", surface="#FFFFFF", ink="#2C2A38", ink_soft="#8A86A0",
                     border="#E4DEF3", accent="#DCD3F2", accent_strong="#C9BEEA",
                     accent_ink="#4B3FA0", avatar="#D4537E"),
@@ -62,10 +62,49 @@ PALETTES = {
                     border="#33333A", accent="#2E2E48", accent_strong="#4A4A78",
                     accent_ink="#9D8CFF", avatar="#7C6FE0"),
 }
-ORDER = ["Lavande", "Lilas", "Cassis", "Fraise", "Corail", "Coucher de soleil", "Pêche",
-         "Blé", "Moka", "Agrume", "Menthe", "Forêt", "Océan", "Glacier", "Ciel", "Brume",
-         "Ardoise", "Nuit", "Encre"]
+_DEFAULT_ORDER = ["Lavande", "Lilas", "Cassis", "Fraise", "Corail", "Coucher de soleil", "Pêche",
+                  "Blé", "Moka", "Agrume", "Menthe", "Forêt", "Océan", "Glacier", "Ciel", "Brume",
+                  "Ardoise", "Nuit", "Encre"]
 TILE_COLORS = ["#7C6FE0", "#1D9E75", "#D85A30", "#378ADD", "#2E9E5B", "#C2497E"]
+
+# --- Themes are DATA, not code -------------------------------------------------
+# The built-in set above is only a FALLBACK. The real palettes are loaded from JSON,
+# so anyone can add or modify a theme WITHOUT touching the code:
+#   /usr/local/lib/focusde/themes.json   the shipped system set (data)
+#   ~/.config/focus/themes.json          per-user themes / overrides (no root needed)
+# File shape:  {"order": ["Name", ...],
+#               "palettes": {"Name": {"bg","surface","ink","ink_soft","border",
+#                                     "accent","accent_strong","accent_ink","avatar"}, ...}}
+# The user file overlays the system file overlays the built-ins; a missing colour key
+# falls back to Lavande, and a missing/broken file is simply ignored.
+import json
+_THEME_FILES = [os.path.join(os.path.dirname(os.path.realpath(__file__)), "themes.json"),
+                os.path.join(CONF, "themes.json")]
+_KEYS = list(_DEFAULT_PALETTES["Lavande"].keys())
+
+def _load_themes():
+    palettes = {k: dict(v) for k, v in _DEFAULT_PALETTES.items()}
+    order = list(_DEFAULT_ORDER)
+    for path in _THEME_FILES:
+        try:
+            data = json.load(open(path, encoding="utf-8"))
+        except Exception:
+            continue
+        base = palettes.get("Lavande", _DEFAULT_PALETTES["Lavande"])
+        for name, pal in (data.get("palettes") or {}).items():
+            if not isinstance(pal, dict):
+                continue
+            merged = dict(palettes.get(name) or base)
+            merged.update({k: v for k, v in pal.items() if k in _KEYS})
+            palettes[name] = {k: merged.get(k, base[k]) for k in _KEYS}
+            if name not in order:
+                order.append(name)
+        fo = data.get("order")
+        if isinstance(fo, list):
+            order = [n for n in fo if n in palettes] + [n for n in order if n not in fo]
+    return palettes, order
+
+PALETTES, ORDER = _load_themes()
 
 def slug(n): return re.sub(r'[^a-zA-Z0-9]+', '_', n or "").strip('_') or "act"
 
