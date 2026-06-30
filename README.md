@@ -1,7 +1,7 @@
 # Focus DE
 
 > A Linux desktop organised **by activity, not by windows.** Clean, pastel,
-> borderless — built to focus, and ideal for a family Raspberry Pi.
+> borderless, full-screen — built to focus, and ideal for a family Raspberry Pi.
 
 ![Focus DE Home](docs/images/home.png)
 
@@ -13,14 +13,19 @@ on **Sway** (Wayland) and hosts **real** Linux applications inside.
 
 - 🎯 **One thing at a time.** An activity = one full-screen context. No more thirty
   scattered windows.
-- 🧩 **Simple zones.** A primary screen, a secondary screen, an applet panel — plus
-  tabs when a zone gets several apps.
+- 🧩 **Simple zones.** A **primary** screen on the left, a **secondary** screen on the
+  right, an applet panel — plus tabs when a zone gets several apps. Apps run edge to
+  edge, with no gaps.
+- 🪟 **Fold what you don't need.** Collapse the secondary zone to give the primary the
+  full width, or hide the applet panel — one click each.
 - 🗂️ **Thematic hubs.** *Work, Learn, Play, Browse, Create*: your apps sorted by use,
   automatically.
 - 🔌 **Handy applets.** Clock, Notes, Calculator, Music, FM-Player, Reminders — right
   in the panel.
 - 🎹 **Built-in software.** Including **FM-Song Tracker**, a MIDI music tracker, and an
   **FM-Player** applet for `.fms` tunes.
+- 🛑 **Tidy up in one click.** Stop an activity to close all its windows and reclaim
+  memory, then drop back to the Home.
 - 🍓 **Lightweight.** Designed for the Raspberry Pi 4; installs for **all** users at
   once.
 
@@ -29,8 +34,8 @@ on **Sway** (Wayland) and hosts **real** Linux applications inside.
 | | |
 |---|---|
 | ![Create hub](docs/images/hub-creer.png) | **Hubs** group your apps by use. "Créer" (Create) gathers creation tools (drawing, audio…) — and leaves out plain viewers. |
-| ![Zones](docs/images/activity-zones.png) | **One activity, two screens** (top/bottom) plus a panel. Multiple apps become tabs. |
-| ![App picker](docs/images/picker.png) | **+ App**: pick the zone, then the application. All your Linux apps are there. |
+| ![Zones](docs/images/activity-zones.png) | **One activity, two screens** (primary left / secondary right, 2/3-1/3) plus a panel. Multiple apps become tabs. |
+| ![App picker](docs/images/picker.png) | **+ App**: pick the zone (**Principal** / **Secondaire**), then the application. All your Linux apps are there. |
 | ![Applets](docs/images/applets.png) | **Applets** in the panel: clock, notes, calculator, music, FM-Player, reminders. |
 
 ## Built-in music: FM-Song Tracker

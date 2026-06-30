@@ -1,8 +1,8 @@
 # Focus DE — User Manual
 
 Focus DE is a Linux desktop environment **organised around activities** rather than
-loose windows. It aims to stay simple and legible (pastel, borderless look), suitable
-both for a demo and for a family Raspberry Pi.
+loose windows. It aims to stay simple and legible (pastel, borderless, full-screen
+look), suitable both for a demo and for a family Raspberry Pi.
 
 > The on-screen interface is in French; this manual keeps the real button labels
 > (e.g. **Accueil** = *Home*, **Créer** = *Create*) and explains them in English.
@@ -17,13 +17,13 @@ fills the screen and is split into **zones**. When you step back, you return to 
 **Accueil** (Home): the overview of your activities.
 
 It is inspired by the *Sugar* desktop (OLPC): you "zoom" between the overview (Home)
-and a single activity.
+and a single full-screen activity.
 
 Three ideas are enough to understand everything:
 
 - **Activity** — a full-screen space dedicated to one task (a Sway *workspace*).
-- **Zone** — an activity is divided into a *primary screen* (top), a *secondary
-  screen* (bottom) and a *panel* on the left.
+- **Zone** — an activity is divided into a **primary** screen (left, ~2/3 of the
+  width), a **secondary** screen (right, ~1/3) and an **applet panel** on the far left.
 - **Applet** — a small utility tile (clock, notes…) placed in the panel.
 
 ---
@@ -32,15 +32,20 @@ Three ideas are enough to understand everything:
 
 ![Focus DE Home](images/home.png)
 
-A discreet **bar** sits at the top:
+A discreet **bar** sits at the top. From left to right:
 
 | Element | Role |
 |--------|------|
-| *(left)* activity name | the current activity |
+| *(left)* activity name | the current activity — click it to open the **activity switcher** |
 | **+ App** | add an application (opens the picker) |
-| **Panneau** | show / hide the applet panel |
-| **Accueil** | go back to the overview |
+| **Panneau** | show / hide the applet panel (left) |
+| **Secondaire** | collapse / restore the secondary zone (right) — *appears only when a secondary zone exists* |
+| **Accueil** | go back to the overview (Home) |
+| **✕** *(red)* | **stop** the current activity — *appears only inside an activity* |
 | *(right)* clock | the time |
+
+Apps run **full-screen** with no gaps; when several apps share a zone they appear as
+**tabs**.
 
 ---
 
@@ -51,7 +56,7 @@ The Home is your starting point (click **Accueil** in the bar at any time). It s
 - a personalised **greeting** and the date;
 - status **cards** (*Reprendre* = Resume, *En ce moment* = Now playing, *Aujourd'hui*
   = Today);
-- the **hub tiles** (*Travailler, Apprendre, Jouer, Naviguer, Créer*) — see §7;
+- the **hub tiles** (*Travailler, Apprendre, Jouer, Naviguer, Créer*) — see §8;
 - your open **activities** (one coloured tile each);
 - the **+ Nouvelle activité** (New activity) tile;
 - on the left, the **applet panel** (by default: Clock + Notes).
@@ -60,32 +65,45 @@ The Home is your starting point (click **Accueil** in the bar at any time). It s
 
 ## 4. Activities
 
-**Create an activity**: click the **+ Nouvelle activité** tile and give it a name. It
-opens empty, ready to be filled with applications.
+**Create an activity** — click the **+ Nouvelle activité** tile and give it a name. It
+opens ready to be filled with applications, with the applet panel on the left.
 
-**Switch activities**: click its tile from the Home, or click the **activity name on
+**Switch activities** — click its tile from the Home, or click the **activity name on
 the left of the top bar** to open a quick switcher and pick another one. (Under the
 hood each activity is a Sway workspace; `Super`+`1`…`9` also works.)
+
+**Stop an activity** — click the red **✕** on the right of the bar. A confirmation
+appears (*all the activity's windows will be closed*); confirm and Focus DE closes
+every window of the activity, frees its memory, and returns you to the Home. Use this
+when you are done with a context and want to reclaim resources.
 
 ---
 
 ## 5. Zones: primary, secondary and panel
 
-![An activity with two zones (top/bottom) and the panel](images/activity-zones.png)
+![An activity with two zones (left/right) and the panel](images/activity-zones.png)
 
-An activity has three zones:
+An activity has up to three zones, side by side:
 
-- **Primary screen** (top) — the main work area;
-- **Secondary screen** (bottom) — a second area, e.g. a terminal or notes;
-- **Panel** (left) — holds the applets and the **+** button.
+- **Primary screen** (left, ~2/3) — the main work area;
+- **Secondary screen** (right, ~1/3) — a second area, e.g. a terminal, a browser or
+  notes alongside the main app;
+- **Panel** (far left) — holds the applets and the **+** button.
 
-When a zone holds several applications, they line up as **tabs** (the coloured bars
-at the top of a zone).
+When a zone holds several applications, they line up as **tabs** (the bars at the top
+of a zone). Switch tabs with the mouse or `Super`+arrow keys.
 
-**Maximise a zone** (temporary full screen):
+**Resize / maximise a zone** (the split toggles between 2/3-1/3 and near-full):
 
-- `Super`+`Page Up` → maximise the **primary** screen;
-- `Super`+`Page Down` → maximise the **secondary** screen.
+- `Super`+`Page Up` → grow the **primary** (left) screen;
+- `Super`+`Page Down` → grow the **secondary** (right) screen.
+
+**Collapse the secondary zone** — click **Secondaire** in the bar. The right zone is
+hidden and the primary takes the **full width**; click **Secondaire** again to bring
+it back to the right at 1/3. (The apps inside it keep running while collapsed.)
+
+**Hide the panel** — click **Panneau** to fold the applet panel away (the zones reflow
+to use the freed space) and again to bring it back.
 
 ---
 
@@ -95,12 +113,13 @@ at the top of a zone).
 
 Click **+ App** in the bar (or press `Super`+`T`). The picker opens:
 
-1. Choose **where** to add it: **En haut** (primary), **En bas** (secondary), or
-   **Raccourci (hub)** to pin it into a hub (§7).
+1. Choose **where** to add it: **Principal** (primary, left), **Secondaire**
+   (secondary, right), or **Raccourci (hub)** to pin it into a hub (§8).
 2. Search/click the application — the list contains **every** application installed
    on the system.
 
-The application opens in the chosen zone (as a tab if the zone is already occupied).
+The application opens in the chosen zone (as a new tab if the zone is already
+occupied). Choosing **Secondaire** for the first time creates the right zone.
 
 ---
 
@@ -117,7 +136,7 @@ standard *freedesktop* categories:
 | **Travailler** (Work) | office apps (word processor, spreadsheet, finance…) |
 | **Apprendre** (Learn) | educational software |
 | **Jouer** (Play) | games |
-| **Naviguer** (Browse) | the web browser |
+| **Naviguer** (Browse) | the web browser (Firefox, in a per-desktop profile) |
 | **Créer** (Create) | **creation** tools — graphics **and** audio/music |
 
 > The **Créer** hub distinguishes *creation* from *consumption*: it lists editors
@@ -134,7 +153,8 @@ You can also **pin** any application into a hub from the picker (**+ App** → t
 ![The applet manager](images/applets.png)
 
 The left panel hosts **applets**. Click the **+** at the top of the panel
-("Applets") to choose which ones to show, then **Appliquer** (Apply).
+("Applets") to choose which ones to show, then **Appliquer** (Apply). The selection is
+remembered **per activity**.
 
 | Applet | Description | Usage |
 |--------|-------------|-------|
@@ -228,13 +248,14 @@ according to the order list, looping.
 
 Press `Super`+`Shift`+`T` to open **Choisir un thème** (Choose a theme). Pick from a
 palette of light and dark themes (Lavande, Océan, Forêt, Nuit, Encre…); the change
-is applied **live**.
+is applied **live** — windows, panel and the top bar all recolour at once.
 
 The **Partout** / **Cette activité** toggle sets the scope:
 
 - **Partout** (Everywhere) — the default theme for the whole desktop;
 - **Cette activité** (This activity) — a colour just for the current activity, so
-  each activity can look distinct.
+  each activity can look distinct. Switching activities then recolours the desktop to
+  match.
 
 ---
 
@@ -246,7 +267,7 @@ The **Partout** / **Cette activité** toggle sets the scope:
 |----------|--------|
 | `Super`+`T` | **+ App** (application picker) |
 | `Super`+`Shift`+`T` | change the **theme** |
-| `Super`+`Page Up` / `Page Down` | maximise the **primary** / **secondary** screen |
+| `Super`+`Page Up` / `Page Down` | grow the **primary** (left) / **secondary** (right) zone |
 | `Super`+`Enter` | open a **terminal** |
 | `Super`+`D` | application menu (fuzzel) |
 | `Super`+`arrows` | change the focused window |

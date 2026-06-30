@@ -1,8 +1,9 @@
-# Focus DE — desktop shell
+# Focus DE — desktop shell (internals)
 
-The Focus DE activity shell that runs on top of **Sway** (wlroots) on the
-Raspberry Pi: pastel/borderless look, activities (tabbed splits = the Sway tree),
-a home/hub launcher, applets, and a theme system.
+The Focus DE activity shell runs on top of **Sway** (wlroots) on the Raspberry Pi:
+pastel, borderless, full-screen look; activities (split + tabbed = the Sway tree); a
+home/hub launcher; applets; and a live theme system. The whole UI is **Sway driven by
+small Python/GTK tools**, wired to the top **waybar** buttons and a few keybinds.
 
 This is a snapshot of the working shell. Personal runtime data (notes, agenda
 contents) is intentionally **not** included.
@@ -18,47 +19,149 @@ Everything ships in `rootfs/`, which mirrors `/`:
 | `rootfs/etc/skel/.config/`             | `/etc/skel/.config/` → each user's `~/.config/` | per-user **config** (sway, waybar, focus, fuzzel) |
 | `rootfs/etc/greetd/config.toml`        | same | login manager → Sway |
 
-The Python scripts locate themselves (`os.path.realpath(__file__)`), so the code
-is relocatable; per-user data (notes, agenda, chosen theme) is read/written under
-the real `$HOME`. The config references the code by its install path
-(`/usr/local/lib/focusde/`) and per-user button scripts via `$HOME`. Because the
-defaults live in `/etc/skel/.config`, every user created afterwards automatically
-gets the desktop. See the top-level [README](../README.md) for install commands.
+The Python scripts locate themselves (`os.path.realpath(__file__)`), so the code is
+relocatable; per-user data (notes, agenda, chosen theme, applet selection) is
+read/written under the real `$HOME` (`~/.config/focus/…`). The config references the
+code by its install path (`/usr/local/lib/focusde/`) and the per-user button scripts
+via `$HOME`. Because the defaults live in `/etc/skel/.config`, every user created
+afterwards automatically gets the desktop. See the [README](../README.md) for install
+commands.
+
+## Activities, workspaces and zones
+
+**An activity = a named Sway workspace.** Workspaces are **created on the fly** (nothing
+is pre-declared at boot except *Accueil*): a tool switches to a free workspace number
+and `rename`s it to the activity name. Sway destroys a workspace as soon as its last
+window closes, so "stopping" an activity is just closing its windows.
+
+Inside an activity the layout is **horizontal** (`default_orientation horizontal`,
+`gaps 0` for the full-screen look). Three logical **zones**, identified by **marks** on
+the window that anchors each zone:
+
+| Zone | Mark | Position | Container |
+|------|------|----------|-----------|
+| Primary  | `Zp_<wsid>` | left, ~2/3 width | tabbed |
+| Secondary | `Zs_<wsid>` | right, ~1/3 width | tabbed |
+| Panel (applets) | `Zl_<wsid>` | far left column | splitv (stacked applets) |
+
+`<wsid>` is the Sway **container id** of the workspace at build time; all per-activity
+data is keyed by a `slug(name)` instead (so it survives id changes) — see *Data*.
+
+### Placing a window (`activity.py`)
+
+`add(zone, cmd)` launches the command, captures the new window via a one-shot
+`get-tree`/window-event subscription (`launch_get`), then either moves it into the
+existing zone (`move container to mark Z*_<wsid>`) or builds the zone with
+`recreate_zone`. Two layout subtleties are handled explicitly:
+
+- **Popping a window out of a tabbed container** is *vertical*: in a tabbed container
+  left/right reorder tabs, so a window only exits by moving up/down. To create the
+  side-by-side primary/secondary, the new window is moved *down* out of the neighbour's
+  tabs and the shared container is then flipped to `splith`; secondary is resized to
+  `33 ppt` (1/3), primary to `67 ppt` (2/3).
+- **The applet panel** must become the left **column**, not a tab. `pop_left(selector)`
+  moves the container left until it is a **direct child of the workspace** (instead of
+  a fixed number of `move left`, which fails as soon as the content zone has more than
+  one tab).
+
+### The scratchpad: folding panel and secondary
+
+Both the panel and the secondary zone are *hidden* by sending their container to the
+Sway **scratchpad** (true hide, not a resize):
+
+- `panel_toggle.py` (**Panneau** button) folds/unfolds the `Zl` panel; on show it
+  re-docks it as the left column (`pop_left` + `split vertical` + width 240px).
+- `secondary_toggle.py` (**Secondaire** button) folds/unfolds the whole `Zs` container;
+  on show it re-docks it on the right (move-down + flip `splith` + `33 ppt`). The button
+  appears only when a `Zs_<wsid>` mark exists for the focused workspace.
+
+### Maximise / restore a zone
+
+`zone_max.py` (`$mod+PageUp` / `$mod+PageDown`) toggles the split between **2/3-1/3** and
+near-full, by **width** (left/right), reading the live `Zp`/`Zs` rectangles.
+
+### Building & cleaning the Home
+
+`build_home()` (`activity.py home`, run by `focus_boot.sh`) builds *Accueil* (panel +
+`home.py`) idempotently. It calls `reap_stale_panels(wsid)` in **both** paths — the
+"already built" shortcut *and* after a fresh build — to kill any orphan `focus-panel`
+left over from an earlier boot rebuild (a panel whose mark doesn't match the current
+workspace id), which otherwise stacked a duplicate panel on the Home.
+
+### Stopping an activity
+
+`activity.py stop [<ws>]` (**✕** button → `stop_activity.py` confirmation dialog) kills
+every window of the workspace; Sway then recycles the now-empty workspace and the tool
+switches back to *Accueil*. `record_activity()` is a deliberate **no-op hook** left in
+`stop()` — the future write point for activity **persistence** (so a stopped activity
+can reappear on the Home next to the hubs and be relaunched). Not yet wired.
 
 ## Components
 
 (paths below are under `rootfs/usr/local/lib/focusde/` for code and
 `rootfs/etc/skel/.config/` for config)
 
-**Sway** — `…/.config/sway/config`: pastel palette, fine borders, tabbed vertical
-layout, keybinds that launch the Python tools below.
+**Sway** — `…/.config/sway/config`: pastel palette, fine borders, `gaps 0`,
+`default_orientation horizontal`, and the keybinds that launch the Python tools.
 
-**Activities / workspaces** — `activity.py`, `activity_switcher.py`,
-`zone_max.py`; `act.json` is the default window layout for a new activity.
+**Activities / zones** — `activity.py` (build/add/stop/reap, the zone engine),
+`activity_switcher.py` (the title-bar switcher), `panel_toggle.py`,
+`secondary_toggle.py`, `zone_max.py`; `act.json` is a reference layout.
 
-**Home / launcher** — `home.py`, `hub.py`, `picker.py` (`$mod+t`); activity
-collections in `…/.config/focus/hubs/*.list`; `…/.config/fuzzel/fuzzel.ini`.
+**Home / launcher** — `home.py` (the Home app: greeting, cards, hub + activity tiles),
+`hub.py` (a category grid), `picker.py` (`$mod+t`; choose zone **Principal /
+Secondaire / Raccourci** then app); hub contents in `…/.config/focus/hubs/*.list`;
+fuzzel in `…/.config/fuzzel/fuzzel.ini`.
 
 **Applets** — framework: `applet.py`, `applet_mgr.py`, `focus_applets.py`,
-`panel_host.py`, `panel_toggle.py`; applets: `applet_clock.py`, `applet_calc.py`,
-`applet_music.py`, `applet_notes.py`, `applet_rappel.py`, `applet_fmplayer.py` (plays
-`.fms` via the fmtracker engine); per-activity layout in `…/.config/focus/applets/*`.
+`panel_host.py` (the GTK host that stacks the chosen applets); applets:
+`applet_clock.py`, `applet_calc.py`, `applet_music.py`, `applet_notes.py`,
+`applet_rappel.py`, `applet_fmplayer.py` (plays `.fms` via the fmtracker engine).
+Per-activity applet selection in `…/.config/focus/applets/<slug>`.
 
-**Theme** — `theme.py`, `theme_apply.py`, `theme_daemon.py`, `focus_theme.py`
-(`$mod+Shift+t`); palettes are built into `focus_theme.py`, per-activity choices in
-`…/.config/focus/{theme,themes/*}`.
+**Theme** — `focus_theme.py` (the built-in palettes + helpers), `theme.py` (the
+picker, `$mod+Shift+t`), `theme_apply.py`, `theme_daemon.py` (subscribes to Sway
+`workspace` events and re-applies the **per-activity** palette to Sway + waybar on each
+switch, without a restart). Choices in `…/.config/focus/{theme,themes/<slug>}`.
 
-**Agenda / notes** — `agenda.py`, `event_dialog.py`, `note_dialog.py`.
+**Agenda / notes** — `agenda.py` (floating agenda window), `event_dialog.py`,
+`note_dialog.py`; data in `…/.config/focus/{agenda.json,notes/<scope>.json}`.
 
-**Panel (waybar)** — `…/.config/waybar/{config.jsonc,style.css}` and the
-`{home,add,applet,panel,activity-name}-btn.sh` buttons.
+**Panel (waybar)** — `…/.config/waybar/{config.jsonc,style.css}` and the per-user
+button scripts: `activity-name.sh` (title + switcher), `add-btn.sh` (**+ App**),
+`panel-btn.sh` (**Panneau**), `secondary-btn.sh` (**Secondaire**, shown only when a
+secondary zone exists), `home-btn.sh` (**Accueil**), `stop-btn.sh` (**✕**, red, shown
+only inside an activity). The waybar style is also produced from
+`focus_theme.WAYBAR_STYLE` when the theme changes (so button styles survive a theme
+switch).
 
-**Boot / helpers** — `focus_boot.sh` (session boot), `go_home.sh`, `add_app.sh`,
-`setup_autostart.sh` (a no-display-manager fallback that execs Sway on tty1).
+**Boot / helpers** — `focus_boot.sh` (session boot: wait for Sway, build the Home,
+retry-safe), `go_home.sh`, `add_app.sh`, `setup_autostart.sh` (a no-display-manager
+fallback that execs Sway on tty1).
 
-> The **fmtracker** app
-> ([`rootfs/usr/local/lib/focusde/apps/fmtracker/`](../rootfs/usr/local/lib/focusde/apps/fmtracker/))
-> is a hosted application AND a reusable, GTK-free engine: `model.py`, `fms.py` (legacy
-> `.fms` import), `synth.py` (libfluidsynth via ctypes), `sequencer.py`, plus `export.py`
-> (MIDI/WAV/MP3 + native MuseScore `.mscx`) and MIDI import; `gridview.py` + `app.py` are
-> the GTK4 UI. The FM-Player applet reuses that engine from the GTK3 shell.
+## Data (per user, under `~/.config/focus/`)
+
+| Path | Contents |
+|------|----------|
+| `theme`, `themes/<slug>` | global theme, per-activity theme |
+| `applets/<slug>` | applet selection for an activity |
+| `notes/<scope>.json` | notes (`__global__` or per-activity slug) |
+| `agenda.json` | agenda events (shared by the Agenda and the Rappel applet) |
+| `hubs/<slug>.list` | apps pinned into a hub |
+| `name` | display name used in the Home greeting |
+
+All keyed by `slug(activity_name)`, so panel/notes/theme stay aligned across an
+activity's lifetime regardless of its Sway workspace id.
+
+## The fmtracker app & engine
+
+[`apps/fmtracker/`](../rootfs/usr/local/lib/focusde/apps/fmtracker/) is a hosted
+application **and** a reusable, GTK-free engine:
+
+- engine: `model.py`, `fms.py` (legacy `.fms` import), `synth.py` (libfluidsynth via
+  ctypes), `sequencer.py`, `gm.py` (General-MIDI names), `export.py`
+  (MIDI/WAV/MP3 + native MuseScore `.mscx`) and MIDI import;
+- UI: `gridview.py` + `app.py` (GTK4), launched by `/usr/local/bin/fmtracker`.
+
+The **FM-Player** applet reuses that engine from the GTK3 shell to play `.fms` tunes in
+the panel.
