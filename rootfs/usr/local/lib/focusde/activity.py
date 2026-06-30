@@ -71,6 +71,36 @@ def ws_window_ids(wsid):
         for c in kids: leaves(c)
     leaves(wsn); return res
 
+def _is_ws_child(selector):
+    # selector = "con_id=N" ou "con_mark=M" -> True si le noeud est enfant DIRECT d'un workspace.
+    key, val = selector.split("=", 1)
+    tree = get("get_tree")
+    res = [False]
+    def match(n):
+        return str(n.get("id")) == val if key == "con_id" else val in (n.get("marks") or [])
+    def walk(n, parent_is_ws):
+        if match(n):
+            res[0] = parent_is_ws
+            return True
+        here_ws = n.get("type") == "workspace"
+        for c in (n.get("nodes") or []) + (n.get("floating_nodes") or []):
+            if walk(c, here_ws):
+                return True
+        return False
+    if tree:
+        walk(tree, False)
+    return res[0]
+
+def pop_left(selector, tries=12):
+    # Sort un conteneur de son parent (tabbed/split) jusqu'a ce qu'il devienne colonne
+    # gauche du workspace. Remplace un "move left" en nombre fixe, qui echoue des que le
+    # conteneur cible a plus d'un onglet (le panneau restait coince comme onglet).
+    for _ in range(tries):
+        if _is_ws_child(selector):
+            return
+        sw("[%s] move left" % selector)
+        time.sleep(0.05)
+
 def recreate_zone(zone, wsid, cid):
     # La zone n'existe pas (activite vierge, ou zone videe). On forme le layout a la volee.
     pref = {"primary":"Zp", "secondary":"Zs", "left":"Zl"}[zone]
@@ -85,8 +115,7 @@ def recreate_zone(zone, wsid, cid):
     sw("[con_id=%d] focus" % cid)
     if zone == "left":
         # panneau gauche = colonne en PILE verticale (sortir du conteneur tabbed du workspace)
-        sw("[con_id=%d] focus" % cid)
-        sw("move left"); sw("move left")   # pop hors du tabbed -> splith[gauche, reste]
+        pop_left("con_id=%d" % cid)         # sortie fiable quel que soit le nb d'onglets
         sw("[con_id=%d] focus" % cid); sw("split vertical")
         sw("[con_id=%d] resize set width 260 px" % cid)
         sw("[con_id=%d] border none" % cid)        # applet panel: no border/title

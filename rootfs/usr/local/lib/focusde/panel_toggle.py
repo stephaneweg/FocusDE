@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 # Focus DE - collapse/expand du panneau gauche : on le cache via le scratchpad (vrai masquage).
-import sys, subprocess, json
+import sys, subprocess, json, os
+sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from activity import pop_left          # sortie fiable a gauche (vs "move left" en nb fixe)
 def sw(c): subprocess.run(["swaymsg", "-q", c])
 def get(t):
     try: return json.loads(subprocess.check_output(["swaymsg", "-t", t]))
@@ -32,7 +34,8 @@ if in_scratch:
     sw("[con_mark=%s] scratchpad show" % mark)
     sw("[con_mark=%s] floating disable" % mark)
     sw("[con_mark=%s] focus" % mark)
-    sw("move left"); sw("move left")
+    pop_left("con_mark=%s" % mark)      # sortir du tabbed quel que soit le nb d'onglets
+    sw("[con_mark=%s] split vertical" % mark)   # colonne en pile (comme a la construction)
     sw("[con_mark=%s] resize set width 240 px" % mark)
 else:
     # plier : envoyer la seule fenetre du panneau au scratchpad
