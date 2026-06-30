@@ -121,14 +121,20 @@ def recreate_zone(zone, wsid, cid):
         sw("[con_id=%d] border none" % cid)        # applet panel: no border/title
         sw("[con_id=%d] mark %s_%d" % (cid, pref, wsid))
         return
+    # sortir du conteneur tabbed voisin : tabs horizontaux -> on sort par le HAUT/BAS,
+    # puis on bascule le conteneur commun des 2 zones en HORIZONTAL (gauche/droite).
     if zone == "primary":
         sw("move up")
     elif zone == "secondary":
         sw("move down")
+    sw("[con_id=%d] focus" % cid); sw("focus parent"); sw("layout splith")
+    sw("[con_id=%d] focus" % cid)
     force_tabbed(cid)
     sw("[con_id=%d] mark %s_%d" % (cid, pref, wsid))
     if zone == "secondary":
-        sw("[con_id=%d] resize set height 33 ppt" % cid)   # split 2/3 - 1/3
+        sw("[con_id=%d] resize set width 33 ppt" % cid)   # secondary = 1/3 (droite)
+    elif zone == "primary":
+        sw("[con_id=%d] resize set width 67 ppt" % cid)   # primary = 2/3 (gauche)
 
 def add(zone, cmd):
     ws = focused_ws()

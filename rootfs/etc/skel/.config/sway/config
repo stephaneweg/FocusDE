@@ -15,12 +15,12 @@ set $urg_ink   #993556
 ### Fond pastel
 output * bg $bg solid_color
 
-### Look : espaces, bordures fines, police
-gaps inner 12
-gaps outer 12
+### Look : apps plein-ecran (aucun gap), bordures fines, police
+gaps inner 0
+gaps outer 0
 default_border pixel 2
 default_floating_border pixel 2
-default_orientation vertical
+default_orientation horizontal
 title_align center
 font pango:Sans 10
 

@@ -22,7 +22,7 @@ def slug(n): return re.sub(r'[^a-zA-Z0-9]+', '_', n or "").strip('_') or "act"
 def hub_file(n): return os.path.expanduser("~/.config/focus/hubs/%s.list" % slug(n))
 def available_zones():
     # le panneau gauche est gere par le gestionnaire d'applets (+ Applet), pas ici.
-    return [("primary", "En haut"), ("secondary", "En bas"), ("raccourci", "Raccourci (hub)")]
+    return [("primary", "Principal"), ("secondary", "Secondaire"), ("raccourci", "Raccourci (hub)")]
 
 PRESET = None
 if "--zone" in sys.argv:

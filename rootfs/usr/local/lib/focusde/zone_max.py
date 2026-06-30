@@ -22,19 +22,19 @@ wsid = focused_wsid()
 if wsid is None: sys.exit(0)
 zs = find_mark("Zs_%d" % wsid); zp = find_mark("Zp_%d" % wsid)
 if not zs or not zp: sys.exit(0)            # besoin des 2 zones
-hs = zs["rect"]["height"]; hp = zp["rect"]["height"]
-total = (hs + hp) or 1
-sec = 100.0 * hs / total                     # part actuelle du bas
+ws = zs["rect"]["width"]; wp = zp["rect"]["width"]
+total = (ws + wp) or 1
+sec = 100.0 * ws / total                      # part actuelle de la DROITE (secondary)
 
 def set_sec(p):
-    sw("[con_mark=Zs_%d] focus" % wsid); sw("resize set height %d ppt" % p)
+    sw("[con_mark=Zs_%d] focus" % wsid); sw("resize set width %d ppt" % p)
 
-if zone == "primary":                        # agrandir le HAUT
+if zone == "primary":                        # agrandir la GAUCHE
     if sec < 18:
         set_sec(33)                          # deja maximise -> 2/3-1/3
     else:
         set_sec(6); sw("[con_mark=Zp_%d] focus" % wsid)
-else:                                        # agrandir le BAS
+else:                                        # agrandir la DROITE
     if sec > 55:
         set_sec(33)                          # deja maximise -> 2/3-1/3
     else:
