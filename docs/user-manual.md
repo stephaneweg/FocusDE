@@ -332,9 +332,9 @@ according to the order list, looping.
 
 ![Choosing a theme](images/theme-picker.png)
 
-Press `Super`+`Shift`+`T` to open **Choisir un thème** (Choose a theme). Pick from a
-palette of light and dark themes (Lavande, Océan, Forêt, Nuit, Encre…); the change
-is applied **live** — windows, panel and the top bar all recolour at once.
+Press `Super`+`Shift`+`T` to open **Choisir un thème** (Choose a theme). Pick from
+**nineteen** light and dark palettes; the change is applied **live** — windows, the
+applet panel and the top bar all recolour at once.
 
 The **Partout** / **Cette activité** toggle sets the scope:
 
@@ -342,6 +342,45 @@ The **Partout** / **Cette activité** toggle sets the scope:
 - **Cette activité** (This activity) — a colour just for the current activity, so
   each activity can look distinct. Switching activities then recolours the desktop to
   match.
+
+### The palettes
+
+Every theme is built from a small set of colours. In the strips below the squares are,
+left to right: **background · surface · border · accent · strong accent · accent text ·
+ink · avatar**.
+
+**Light themes**
+
+| Theme | Palette |
+|-------|---------|
+| **Lavande** | ![Lavande palette](images/palettes/lavande.png) |
+| **Lilas** | ![Lilas palette](images/palettes/lilas.png) |
+| **Cassis** | ![Cassis palette](images/palettes/cassis.png) |
+| **Fraise** | ![Fraise palette](images/palettes/fraise.png) |
+| **Corail** | ![Corail palette](images/palettes/corail.png) |
+| **Coucher de soleil** | ![Coucher de soleil palette](images/palettes/coucher-de-soleil.png) |
+| **Pêche** | ![Pêche palette](images/palettes/peche.png) |
+| **Blé** | ![Blé palette](images/palettes/ble.png) |
+| **Moka** | ![Moka palette](images/palettes/moka.png) |
+| **Agrume** | ![Agrume palette](images/palettes/agrume.png) |
+| **Menthe** | ![Menthe palette](images/palettes/menthe.png) |
+| **Forêt** | ![Forêt palette](images/palettes/foret.png) |
+| **Océan** | ![Océan palette](images/palettes/ocean.png) |
+| **Glacier** | ![Glacier palette](images/palettes/glacier.png) |
+| **Ciel** | ![Ciel palette](images/palettes/ciel.png) |
+| **Brume** | ![Brume palette](images/palettes/brume.png) |
+
+**Dark themes**
+
+| Theme | Palette |
+|-------|---------|
+| **Ardoise** | ![Ardoise palette](images/palettes/ardoise.png) |
+| **Nuit** | ![Nuit palette](images/palettes/nuit.png) |
+| **Encre** | ![Encre palette](images/palettes/encre.png) |
+
+> The palette strips are generated from the shell's real theme definitions with
+> [`tools/gen_palettes.py`](../tools/gen_palettes.py) — re-run it if the palettes
+> change.
 
 ---
 
