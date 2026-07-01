@@ -29,8 +29,10 @@ BASE_URL = os.environ.get("NEURO_BASE_URL") or _CFG.get("base_url") \
 MODEL = os.environ.get("NEURO_MODEL") or _CFG.get("model") or "llama-3.3-70b-versatile"
 API_KEY = os.environ.get("NEURO_API_KEY") or _CFG.get("api_key") or ""
 # Recherche de sources (RAG hybride) : web fiable Tavily (clé) + OpenAlex (sans clé).
+# DÉSACTIVÉE par défaut : les appels réseau synchrones avant le prompt ralentissent trop
+# Neuro. Réactivable en mettant "search": true dans le config assistant.
 TAVILY_KEY = os.environ.get("NEURO_TAVILY_KEY") or _CFG.get("tavily_key") or ""
-SEARCH_ON = bool(_CFG.get("search", True))
+SEARCH_ON = bool(_CFG.get("search", False))
 
 # --- Synthèse vocale (Piper, hors-ligne) ---
 PIPER_BIN = os.path.expanduser("~/piper/piper/piper")
