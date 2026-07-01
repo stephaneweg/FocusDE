@@ -19,11 +19,7 @@ def draw(mood):
     def circle(c, r, **kw):
         d.ellipse([c[0] - r, c[1] - r, c[0] + r, c[1] + r], **kw)
 
-    # fond pastel (teinté selon l'humeur pour renforcer la lecture)
-    bg = {"neutre": (233, 228, 246), "content": (231, 244, 233), "pensif": (233, 233, 246),
-          "surpris": (247, 243, 224), "triste": (226, 232, 244), "fier": (246, 238, 224)}[mood]
-    d.rounded_rectangle([0, 0, S, S], radius=140, fill=bg + (255,))
-
+    # fond TRANSPARENT : l'avatar colle au thème (le fond du header transparaît).
     # tignasse blanche
     for a in range(-70, 71, 14):
         rad = math.radians(a - 90)
