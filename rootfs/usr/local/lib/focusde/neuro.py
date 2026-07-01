@@ -83,6 +83,25 @@ def age_prompt():
             "vocabulaire pour les plus grands. L'exactitude et la rigueur scientifiques "
             "restent identiques quel que soit l'âge." % (a, a))
 
+_AGE_RE = re.compile(r"j['’\s]?ai\s+(\d{1,2})\s*ans?\b", re.I)
+
+def set_age_years(age):
+    # Enregistre une date de naissance déduite d'un âge (l'âge se recalcule ensuite tout seul).
+    if not 1 <= age <= 110:
+        return
+    t = datetime.date.today()
+    try:
+        bd = t.replace(year=t.year - age)
+    except ValueError:                                # 29 février
+        bd = t.replace(year=t.year - age, day=28)
+    u = load_user(); u["birthdate"] = bd.isoformat(); save_user(u)
+
+def activity_prompt(sc):
+    if not sc or sc.lower() in ("accueil", "home"):
+        return ""
+    return ("\n\nACTIVITÉ EN COURS : « %s ». L'élève travaille dans cette activité ; "
+            "sers-t'en pour mieux cerner le sujet de ses questions." % sc)
+
 def _card():
     try:
         return json.load(open(os.path.join(ASSET, "professeur-neuro.json"), encoding="utf-8")).get("data", {})
@@ -212,12 +231,7 @@ class Neuro(Gtk.Window):
         dlg.destroy()
         if resp != Gtk.ResponseType.OK:
             return
-        t = datetime.date.today()
-        try:
-            bd = t.replace(year=t.year - age)
-        except ValueError:                            # 29 février
-            bd = t.replace(year=t.year - age, day=28)
-        u = load_user(); u["birthdate"] = bd.isoformat(); save_user(u)
+        set_age_years(age)
 
     def bubble(self, role, text):
         align = Gtk.Align.END if role == "user" else Gtk.Align.START
@@ -237,6 +251,9 @@ class Neuro(Gtk.Window):
         text = self.entry.get_text().strip()
         if not text:
             return
+        m = _AGE_RE.search(text)                      # « j'ai 8 ans » -> met à jour l'âge avant le prompt
+        if m:
+            set_age_years(int(m.group(1)))
         self._stop_speaking()                        # couper la voix en cours
         self.entry.set_text("")
         self.bubble("user", text)
@@ -330,7 +347,8 @@ class Neuro(Gtk.Window):
             GLib.idle_add(self._finish)
             return
         payload = {"model": MODEL, "stream": True,
-                   "messages": [{"role": "system", "content": SYSTEM + age_prompt()}]
+                   "messages": [{"role": "system",
+                                 "content": SYSTEM + age_prompt() + activity_prompt(self.scope)}]
                    + [{"role": m["role"], "content": m["content"]} for m in self.msgs]}
         headers = {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY,
                    "User-Agent": "curl/8.5.0"}   # sinon Cloudflare bloque urllib (erreur 1010)
