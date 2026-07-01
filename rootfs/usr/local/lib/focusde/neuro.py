@@ -214,31 +214,43 @@ class Neuro(Gtk.Window):
         if self._tts_thread and self._tts_thread.is_alive():
             self._tts_thread.join(timeout=0.4)
         self._tts_stop = threading.Event()
-        self._tts_thread = threading.Thread(target=self._speak, args=(text,), daemon=True)
+        label = self.cur_label                          # bulle cible figée pour ce tour
+        self._tts_thread = threading.Thread(target=self._speak, args=(text, label), daemon=True)
         self._tts_thread.start()
 
-    def _speak(self, text):
-        # lit la réponse phrase par phrase (Piper synth -> aplay), annulable.
-        clean = re.sub(r"[*#`>_\[\]]", "", text)
-        clean = re.sub(r"\s+", " ", clean).strip()
-        for sent in re.split(r"(?<=[.!?…:])\s+", clean):
+    def _speak(self, text, label):
+        # Découpe en phrases. Pour chacune : on la SYNTHÉTISE (Piper), on l'AFFICHE dans
+        # la bulle pile au moment où le son démarre (texte ↔ voix synchronisés), on la joue.
+        parts = [p.strip() for p in re.split(r"(?<=[.!?…:])\s+", text.strip()) if p.strip()]
+        shown = ""
+        for sent in parts:
             if self._tts_stop.is_set():
+                GLib.idle_add(self._set_reply, text, label)   # annulé -> tout afficher
                 return
-            sent = sent.strip()
-            if not sent:
-                continue
+            tts = re.sub(r"\s+", " ", re.sub(r"[*#`>_\[\]]", " ", sent)).strip()
             try:
-                piper = subprocess.Popen([PIPER_BIN, "--model", PIPER_VOICE, "--output_file", TTS_WAV],
-                                         stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                self._tts_cur = piper
-                piper.communicate(sent.encode("utf-8"))
-                if self._tts_stop.is_set():
-                    return
-                play = subprocess.Popen(["aplay", "-q", TTS_WAV], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-                self._tts_cur = play
-                play.wait()
+                if tts:
+                    piper = subprocess.Popen([PIPER_BIN, "--model", PIPER_VOICE, "--output_file", TTS_WAV],
+                                             stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    self._tts_cur = piper
+                    piper.communicate(tts.encode("utf-8"))    # (bloque le temps de la synthèse)
             except Exception:
+                GLib.idle_add(self._set_reply, text, label)
                 return
+            if self._tts_stop.is_set():
+                GLib.idle_add(self._set_reply, text, label)
+                return
+            shown = (shown + " " + sent).strip()
+            GLib.idle_add(self._set_reply, shown, label)      # afficher la phrase = début du son
+            if tts:
+                try:
+                    play = subprocess.Popen(["aplay", "-q", TTS_WAV],
+                                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    self._tts_cur = play
+                    play.wait()
+                except Exception:
+                    pass
+        GLib.idle_add(self._set_reply, text, label)           # tout est affiché à la fin
 
     def _stream(self):
         if not API_KEY:
@@ -285,9 +297,17 @@ class Neuro(Gtk.Window):
                 self.mood_parsed = True
             else:
                 return False                         # tag encore en cours de réception : on attend
-        if self.cur_label:
-            self.cur_label.set_text(self.cur_text or "…")
-        self._to_bottom()
+        # Avec la voix : on n'affiche PAS pendant le streaming — le texte apparaîtra
+        # phrase par phrase, synchronisé avec l'audio (voir _speak). Sans voix : live.
+        if not self.tts_on:
+            self._set_reply(self.cur_text)
+        return False
+
+    def _set_reply(self, text, label=None):
+        tgt = label if label is not None else self.cur_label
+        if tgt is not None and tgt is self.cur_label:     # n'écris que dans la bulle courante
+            tgt.set_text(text or "…")
+            self._to_bottom()
         return False
 
     def _finish(self):
