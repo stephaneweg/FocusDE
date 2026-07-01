@@ -51,7 +51,7 @@ def _card():
 CARD = _card()
 SYSTEM = CARD.get("system_prompt") or CARD.get("description") \
     or "Tu es le Professeur Neuro, un hibou savant bienveillant. Réponds en français, tutoie, reste bref."
-GREETING = CARD.get("first_mes") or "Hou-hou ⚡ Te revoilà ! Sur quelle énigme on se penche ?"
+GREETING = CARD.get("first_mes") or "Te revoilà ⚡ Sur quelle énigme on se penche ?"
 AVATAR = os.path.join(ASSET, "neuro_avatar.png")
 
 def scope():
