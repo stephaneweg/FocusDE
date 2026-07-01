@@ -6,7 +6,20 @@
 # gather() renvoie un bloc texte « SOURCES … » à injecter dans le system prompt.
 # Tout est tolérant aux pannes : sans clé ou en cas d'échec réseau, on renvoie ce qu'on
 # peut (voire une chaîne vide), et Neuro répond quand même.
-import json, re, time, urllib.request, urllib.parse
+import json, re, time, socket, urllib.request, urllib.parse
+
+# --- Réseau : PRÉFÉRER L'IPv4 -------------------------------------------------
+# Sur certains réseaux (ex. VOO) le chemin IPv6 vers l'API est cassé : urllib tente
+# l'IPv6 en premier et STALLE ~60 s (timeout de connexion TCP) avant de basculer en
+# IPv4. On réordonne getaddrinfo pour mettre l'IPv4 d'abord — ça vaut pour tout le
+# process (Groq, Tavily, OpenAlex), car neuro.py importe ce module avant ses requêtes.
+_gai = socket.getaddrinfo
+def _gai_v4first(host, port, family=0, *a, **k):
+    res = _gai(host, port, family, *a, **k)
+    v4 = [r for r in res if r[0] == socket.AF_INET]
+    return (v4 + [r for r in res if r[0] != socket.AF_INET]) if v4 else res
+if getattr(socket.getaddrinfo, "__name__", "") != "_gai_v4first":
+    socket.getaddrinfo = _gai_v4first
 
 TAVILY_URL = "https://api.tavily.com/search"
 OPENALEX_URL = "https://api.openalex.org/works"
