@@ -103,7 +103,7 @@ def pop_left(selector, tries=12):
 
 def recreate_zone(zone, wsid, cid):
     # La zone n'existe pas (activite vierge, ou zone videe). On forme le layout a la volee.
-    pref = {"primary":"Zp", "secondary":"Zs", "left":"Zl"}[zone]
+    pref = {"primary":"Zp", "secondary":"Zs", "left":"Zl", "assistant":"Za"}[zone]
     sw("[con_id=%d] floating disable" % cid)   # jeux SDL (frozen-bubble=perl) s'ouvrent flottants
     others = [w for w in ws_window_ids(wsid) if w != cid]
     if not others:
@@ -125,21 +125,21 @@ def recreate_zone(zone, wsid, cid):
     # puis on bascule le conteneur commun des 2 zones en HORIZONTAL (gauche/droite).
     if zone == "primary":
         sw("move up")
-    elif zone == "secondary":
+    elif zone in ("secondary", "assistant"):
         sw("move down")
     sw("[con_id=%d] focus" % cid); sw("focus parent"); sw("layout splith")
     sw("[con_id=%d] focus" % cid)
     force_tabbed(cid)
     sw("[con_id=%d] mark %s_%d" % (cid, pref, wsid))
-    if zone == "secondary":
-        sw("[con_id=%d] resize set width 33 ppt" % cid)   # secondary = 1/3 (droite)
+    if zone in ("secondary", "assistant"):
+        sw("[con_id=%d] resize set width 33 ppt" % cid)   # secondary/assistant = 1/3 (droite)
     elif zone == "primary":
         sw("[con_id=%d] resize set width 67 ppt" % cid)   # primary = 2/3 (gauche)
 
 def add(zone, cmd):
     ws = focused_ws()
     if not ws: print("no ws"); return 1
-    pref = {"primary":"Zp", "secondary":"Zs", "left":"Zl"}.get(zone)
+    pref = {"primary":"Zp", "secondary":"Zs", "left":"Zl", "assistant":"Za"}.get(zone)
     if not pref: print("zone inconnue"); return 1
     wsid = ws["id"]; mark = "%s_%d" % (pref, wsid)
     cid = launch_get(cmd)

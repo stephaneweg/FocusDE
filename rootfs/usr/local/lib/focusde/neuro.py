@@ -159,7 +159,8 @@ class Neuro(Gtk.Window):
         payload = {"model": MODEL, "stream": True,
                    "messages": [{"role": "system", "content": SYSTEM}]
                    + [{"role": m["role"], "content": m["content"]} for m in self.msgs]}
-        headers = {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY}
+        headers = {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY,
+                   "User-Agent": "curl/8.5.0"}   # sinon Cloudflare bloque urllib (erreur 1010)
         try:
             req = urllib.request.Request(BASE_URL, data=json.dumps(payload).encode("utf-8"), headers=headers)
             with urllib.request.urlopen(req, timeout=120) as r:
