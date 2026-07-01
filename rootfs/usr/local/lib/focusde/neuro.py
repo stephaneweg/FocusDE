@@ -4,7 +4,7 @@
 # l'endpoint et la persona sont en dur, ça marche tout seul. Look pastel Focus DE,
 # avatar en haut, et mémoire PAR ACTIVITÉ (l'historique est stocké par slug de
 # workspace, donc chaque activité garde son propre fil).
-import gi, os, sys, json, threading, urllib.request, re, subprocess, glob
+import gi, os, sys, json, threading, urllib.request, re, subprocess, glob, datetime
 LIB = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, LIB)
 import focus_theme
@@ -42,6 +42,46 @@ def save_config():
         os.chmod(p, 0o600)
     except Exception:
         pass
+
+# --- Profil utilisateur (GLOBAL à Focus DE, partagé par toutes les activités) ---
+# On stocke la DATE DE NAISSANCE (pas l'âge) et on recalcule l'âge à chaque requête,
+# pour que le niveau de langage de Neuro s'ajuste tout seul en grandissant.
+USER_CFG = os.path.expanduser("~/.config/focus/user.json")
+
+def load_user():
+    try:
+        return json.load(open(USER_CFG, encoding="utf-8"))
+    except Exception:
+        return {}
+
+def save_user(d):
+    try:
+        os.makedirs(os.path.dirname(USER_CFG), exist_ok=True)
+        json.dump(d, open(USER_CFG, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+def user_age():
+    bd = load_user().get("birthdate")
+    if not bd:
+        return None
+    try:
+        y, m, d = (int(x) for x in bd.split("-")[:3])
+        t = datetime.date.today()
+        age = t.year - y - ((t.month, t.day) < (m, d))
+        return age if 0 < age < 120 else None
+    except Exception:
+        return None
+
+def age_prompt():
+    a = user_age()
+    if not a:
+        return ""
+    return ("\n\nÂGE DE L'ÉLÈVE : %d ans. Adapte systématiquement ton vocabulaire, la "
+            "longueur et la complexité de tes explications à un enfant de %d ans : mots "
+            "simples et phrases courtes pour les plus jeunes, davantage de précision et de "
+            "vocabulaire pour les plus grands. L'exactitude et la rigueur scientifiques "
+            "restent identiques quel que soit l'âge." % (a, a))
 
 def _card():
     try:
@@ -147,6 +187,37 @@ class Neuro(Gtk.Window):
         else:
             for m in self.msgs:
                 self.bubble(m["role"], m["content"])
+
+    def ask_age(self):
+        # Premier lancement : demande l'âge, en déduit et enregistre la date de naissance
+        # dans le profil user global. Rien à faire si on connaît déjà l'âge.
+        if user_age() is not None:
+            return
+        dlg = Gtk.Dialog(title="Bienvenue !", transient_for=self, modal=True)
+        dlg.add_button("C'est parti", Gtk.ResponseType.OK)
+        box = dlg.get_content_area(); box.set_spacing(10)
+        for mrg in ("top", "bottom", "start", "end"):
+            getattr(box, "set_margin_" + mrg)(16)
+        lbl = Gtk.Label(label="Bonjour ! Pour t'expliquer les choses à ta façon,\n"
+                              "dis-moi quel âge tu as :")
+        lbl.set_justify(Gtk.Justification.CENTER)
+        box.add(lbl)
+        adj = Gtk.Adjustment(value=8, lower=3, upper=18, step_increment=1, page_increment=1)
+        spin = Gtk.SpinButton(adjustment=adj, numeric=True)
+        spin.set_halign(Gtk.Align.CENTER); spin.set_value(8)
+        box.add(spin)
+        dlg.show_all()
+        resp = dlg.run()
+        age = int(spin.get_value())
+        dlg.destroy()
+        if resp != Gtk.ResponseType.OK:
+            return
+        t = datetime.date.today()
+        try:
+            bd = t.replace(year=t.year - age)
+        except ValueError:                            # 29 février
+            bd = t.replace(year=t.year - age, day=28)
+        u = load_user(); u["birthdate"] = bd.isoformat(); save_user(u)
 
     def bubble(self, role, text):
         align = Gtk.Align.END if role == "user" else Gtk.Align.START
@@ -259,7 +330,7 @@ class Neuro(Gtk.Window):
             GLib.idle_add(self._finish)
             return
         payload = {"model": MODEL, "stream": True,
-                   "messages": [{"role": "system", "content": SYSTEM}]
+                   "messages": [{"role": "system", "content": SYSTEM + age_prompt()}]
                    + [{"role": m["role"], "content": m["content"]} for m in self.msgs]}
         headers = {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY,
                    "User-Agent": "curl/8.5.0"}   # sinon Cloudflare bloque urllib (erreur 1010)
@@ -334,6 +405,7 @@ def main():
     w = Neuro(); w.connect("destroy", Gtk.main_quit)
     w.set_default_size(420, 640)
     w.show_all()
+    w.ask_age()                                       # 1er lancement : demander l'âge
     Gtk.main()
 
 if __name__ == "__main__":
