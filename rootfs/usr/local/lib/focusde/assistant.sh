@@ -41,19 +41,23 @@ PY
 
 # 3) Placer Firefox -> SillyTavern dans la zone Secondaire (profil dédié à l'assistant).
 PROF="$HOME/.mozilla/firefox/assistant"
-mkdir -p "$PROF"
-# Profil "kiosque léger" : pas de page de premier lancement, démarre sur SillyTavern.
-if [ ! -f "$PROF/user.js" ]; then
-    cat > "$PROF/user.js" <<EOF
+mkdir -p "$PROF/chrome"
+# Profil "kiosque" : pas de page de premier lancement, ET pas de chrome navigateur
+# (onglets / barre d'adresse / barres d'outils) — juste la page SillyTavern. On reste
+# tuilé dans la zone (pas de --kiosk, qui passerait en plein écran). Idempotent.
+cat > "$PROF/user.js" <<EOF
 user_pref("browser.startup.homepage", "$ST_URL");
 user_pref("browser.startup.firstrunSkipsHomepage", true);
 user_pref("browser.aboutwelcome.enabled", false);
 user_pref("startup.homepage_welcome_url", "");
-user_pref("startup.homepage_welcome_url.additional", "");
 user_pref("datareporting.policy.firstRunURL", "");
 user_pref("browser.messaging-system.whatsNewPanel.enabled", false);
 user_pref("browser.shell.checkDefaultBrowser", false);
+user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
 EOF
-fi
+cat > "$PROF/chrome/userChrome.css" <<'EOF'
+/* Focus DE assistant : masque tout le chrome (onglets, barre d'adresse, outils). */
+#navigator-toolbox { visibility: collapse !important; }
+EOF
 python3 "$LIB/activity.py" add secondary env MOZ_ENABLE_WAYLAND=1 firefox-esr \
     --profile "$PROF" --new-window "$ST_URL"
