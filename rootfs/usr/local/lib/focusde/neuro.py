@@ -8,6 +8,7 @@ import gi, os, sys, json, threading, urllib.request, re, subprocess, glob, datet
 LIB = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, LIB)
 import focus_theme
+import neuro_search
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk, GdkPixbuf
 GLib.set_prgname("focus-assistant")
@@ -27,6 +28,9 @@ BASE_URL = os.environ.get("NEURO_BASE_URL") or _CFG.get("base_url") \
     or "https://api.groq.com/openai/v1/chat/completions"
 MODEL = os.environ.get("NEURO_MODEL") or _CFG.get("model") or "llama-3.3-70b-versatile"
 API_KEY = os.environ.get("NEURO_API_KEY") or _CFG.get("api_key") or ""
+# Recherche de sources (RAG hybride) : web fiable Tavily (clé) + OpenAlex (sans clé).
+TAVILY_KEY = os.environ.get("NEURO_TAVILY_KEY") or _CFG.get("tavily_key") or ""
+SEARCH_ON = bool(_CFG.get("search", True))
 
 # --- Synthèse vocale (Piper, hors-ligne) ---
 PIPER_BIN = os.path.expanduser("~/piper/piper/piper")
@@ -346,9 +350,14 @@ class Neuro(Gtk.Window):
                           "~/.config/focus/assistant/config.json (champ « api_key »).")
             GLib.idle_add(self._finish)
             return
+        sources = ""
+        if SEARCH_ON:
+            q = next((m["content"] for m in reversed(self.msgs) if m["role"] == "user"), "")
+            a = user_age()
+            sources = neuro_search.gather(q, TAVILY_KEY, academic=(a is None or a >= 11))
         payload = {"model": MODEL, "stream": True,
                    "messages": [{"role": "system",
-                                 "content": SYSTEM + age_prompt() + activity_prompt(self.scope)}]
+                                 "content": SYSTEM + age_prompt() + activity_prompt(self.scope) + sources}]
                    + [{"role": m["role"], "content": m["content"]} for m in self.msgs]}
         headers = {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY,
                    "User-Agent": "curl/8.5.0"}   # sinon Cloudflare bloque urllib (erreur 1010)
