@@ -4,7 +4,7 @@
 # l'endpoint et la persona sont en dur, ça marche tout seul. Look pastel Focus DE,
 # avatar en haut, et mémoire PAR ACTIVITÉ (l'historique est stocké par slug de
 # workspace, donc chaque activité garde son propre fil).
-import gi, os, sys, json, threading, urllib.request
+import gi, os, sys, json, threading, urllib.request, re
 LIB = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, LIB)
 import focus_theme
@@ -83,20 +83,19 @@ class Neuro(Gtk.Window):
         root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(root)
 
-        # --- en-tête : avatar + nom ---
-        head = Gtk.Box(spacing=10); head.get_style_context().add_class("head")
-        try:
-            pb = GdkPixbuf.Pixbuf.new_from_file_at_size(AVATAR, 44, 44)
-            av = Gtk.Image.new_from_pixbuf(pb); av.get_style_context().add_class("avatar")
-            head.pack_start(av, False, False, 0)
-        except Exception:
-            pass
-        tt = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
-        nm = Gtk.Label(label="Professeur Neuro"); nm.set_xalign(0); nm.get_style_context().add_class("name")
-        sb = Gtk.Label(label="assistant · %s" % self.scope); sb.set_xalign(0); sb.get_style_context().add_class("sub")
-        tt.pack_start(nm, False, False, 0); tt.pack_start(sb, False, False, 0)
-        head.pack_start(tt, False, False, 0)
+        # --- en-tête : GRAND avatar d'humeur (pleine largeur) + nom ---
+        head = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+        head.get_style_context().add_class("head")
+        self.avatar_img = Gtk.Image(); self.avatar_img.set_halign(Gtk.Align.CENTER)
+        head.pack_start(self.avatar_img, False, False, 0)
+        nm = Gtk.Label(label="Professeur Neuro"); nm.set_halign(Gtk.Align.CENTER)
+        nm.get_style_context().add_class("name")
+        sb = Gtk.Label(label="assistant · %s" % self.scope); sb.set_halign(Gtk.Align.CENTER)
+        sb.get_style_context().add_class("sub")
+        head.pack_start(nm, False, False, 0); head.pack_start(sb, False, False, 0)
         root.pack_start(head, False, False, 0)
+        self.mood = None
+        self.set_mood("content")                     # accueil = sourire
 
         # --- fil de discussion ---
         self.scroll = Gtk.ScrolledWindow(); self.scroll.set_vexpand(True)
@@ -147,8 +146,24 @@ class Neuro(Gtk.Window):
         save_hist(self.scope, self.msgs)
         self.cur_label = self.bubble("assistant", "…")
         self.cur_text = ""
+        self.mood_parsed = False
+        self.set_mood("pensif")                      # il réfléchit pendant la génération
         self.streaming = True
         threading.Thread(target=self._stream, daemon=True).start()
+
+    MOODS = ("neutre", "content", "pensif", "surpris", "triste", "fier")
+
+    def set_mood(self, mood):
+        if mood == self.mood:
+            return
+        path = os.path.join(ASSET, "moods", mood + ".png")
+        if not os.path.exists(path):
+            path = AVATAR
+        try:
+            self.avatar_img.set_from_pixbuf(GdkPixbuf.Pixbuf.new_from_file_at_size(path, 132, 132))
+            self.mood = mood
+        except Exception:
+            pass
 
     def _stream(self):
         if not API_KEY:
@@ -184,8 +199,19 @@ class Neuro(Gtk.Window):
 
     def _append(self, tok):
         self.cur_text += tok
+        if not self.mood_parsed:
+            s = self.cur_text.lstrip()
+            m = re.match(r"\[\s*(?:humeur\s*:\s*)?([a-zA-Zàâéèêïôùûç]+)\s*\]", s, re.I)
+            if m and m.group(1).lower() in self.MOODS:  # tag humeur -> régler l'avatar + le retirer
+                self.set_mood(m.group(1).lower())
+                self.cur_text = s[m.end():].lstrip()
+                self.mood_parsed = True
+            elif (s and s[0] != "[") or len(s) > 24:  # pas de tag au début -> on affiche tel quel
+                self.mood_parsed = True
+            else:
+                return False                         # tag encore en cours de réception : on attend
         if self.cur_label:
-            self.cur_label.set_text(self.cur_text)
+            self.cur_label.set_text(self.cur_text or "…")
         self._to_bottom()
         return False
 
