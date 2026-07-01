@@ -1,21 +1,18 @@
 #!/usr/bin/env bash
-# Focus DE — ouvre l'assistant (Professeur Neuro / SillyTavern) dans la zone Secondaire.
-# Ollama + SillyTavern tournent en services systemd ; ici on s'assure que ST répond,
-# on déplie la Secondaire si elle est repliée, puis on y place Firefox -> localhost:8000.
+# Focus DE — ouvre l'assistant (Professeur Neuro) dans la zone Secondaire.
+# C'est une petite app GTK (neuro.py) qui parle DIRECTEMENT à Ollama : pas de
+# serveur Node, pas de navigateur, aucune config. On déplie la Secondaire si elle
+# est repliée, et on y place l'app (ou on la re-focus si elle est déjà ouverte).
 set +e
 export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/run/user/$(id -u)}"
 export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-1}"
 export SWAYSOCK="${SWAYSOCK:-$(ls "$XDG_RUNTIME_DIR"/sway-ipc.*.sock 2>/dev/null | head -1)}"
 LIB="$(cd "$(dirname "$0")" && pwd)"
-ST_URL="http://localhost:8000"
 
-# 1) SillyTavern doit répondre (service systemd ; on le (re)démarre si besoin).
-if ! curl -s -o /dev/null "$ST_URL"; then
-    systemctl --user start sillytavern.service 2>/dev/null
-    for _ in $(seq 1 40); do curl -s -o /dev/null "$ST_URL" && break; sleep 1; done
-fi
+# Ollama (service systemd) — le démarrer si besoin.
+systemctl is-active --quiet ollama 2>/dev/null || systemctl start ollama 2>/dev/null
 
-# 2) Si la zone Secondaire existe mais est repliée (scratchpad), la révéler d'abord.
+# Déjà ouvert dans cette activité ? -> révéler la Secondaire si repliée + focus, et sortir.
 python3 - "$LIB" <<'PY'
 import sys, json, subprocess
 def get(t):
@@ -25,39 +22,26 @@ wsid = next((w["id"] for w in (get("get_workspaces") or []) if w.get("focused"))
 if wsid is None:
     sys.exit(0)
 mark = "Zs_%d" % wsid
-tree = get("get_tree"); scratched = [False]
+tree = get("get_tree")
+state = {"scratched": False, "assist": False}
 def walk(n, s):
     if n.get("type") == "workspace" and n.get("name") == "__i3_scratch":
         s = True
     if mark in (n.get("marks") or []):
-        scratched[0] = s
+        state["scratched"] = s
+    if n.get("app_id") == "focus-assistant":
+        state["assist"] = True
     for c in (n.get("nodes") or []) + (n.get("floating_nodes") or []):
         walk(c, s)
 if tree:
     walk(tree, False)
-if scratched[0]:                     # secondaire repliée -> l'afficher (toggle = show)
-    subprocess.run(["python3", sys.argv[1] + "/secondary_toggle.py"])
+if state["scratched"]:
+    subprocess.run(["python3", sys.argv[1] + "/secondary_toggle.py"])   # révéler la Secondaire
+if state["assist"]:
+    subprocess.run(["swaymsg", "-q", "[app_id=focus-assistant] focus"])
+    sys.exit(3)   # déjà ouvert -> ne pas relancer
 PY
+[ $? -eq 3 ] && exit 0
 
-# 3) Placer Firefox -> SillyTavern dans la zone Secondaire (profil dédié à l'assistant).
-PROF="$HOME/.mozilla/firefox/assistant"
-mkdir -p "$PROF/chrome"
-# Profil "kiosque" : pas de page de premier lancement, ET pas de chrome navigateur
-# (onglets / barre d'adresse / barres d'outils) — juste la page SillyTavern. On reste
-# tuilé dans la zone (pas de --kiosk, qui passerait en plein écran). Idempotent.
-cat > "$PROF/user.js" <<EOF
-user_pref("browser.startup.homepage", "$ST_URL");
-user_pref("browser.startup.firstrunSkipsHomepage", true);
-user_pref("browser.aboutwelcome.enabled", false);
-user_pref("startup.homepage_welcome_url", "");
-user_pref("datareporting.policy.firstRunURL", "");
-user_pref("browser.messaging-system.whatsNewPanel.enabled", false);
-user_pref("browser.shell.checkDefaultBrowser", false);
-user_pref("toolkit.legacyUserProfileCustomizations.stylesheets", true);
-EOF
-cat > "$PROF/chrome/userChrome.css" <<'EOF'
-/* Focus DE assistant : masque tout le chrome (onglets, barre d'adresse, outils). */
-#navigator-toolbox { visibility: collapse !important; }
-EOF
-python3 "$LIB/activity.py" add secondary env MOZ_ENABLE_WAYLAND=1 firefox-esr \
-    --profile "$PROF" --new-window "$ST_URL"
+# Sinon : lancer l'app assistant dans la zone Secondaire.
+python3 "$LIB/activity.py" add secondary python3 "$LIB/neuro.py"
