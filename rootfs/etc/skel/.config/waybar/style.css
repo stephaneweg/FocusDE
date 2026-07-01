@@ -11,6 +11,8 @@ window#waybar { background: #F3F1FA; color: #4B3FA0; }
 #custom-panel:hover { background: #C9BEEA; }
 #custom-secondary { background: #DCD3F2; color: #4B3FA0; border-radius: 12px; padding: 4px 12px; margin: 6px 4px; }
 #custom-secondary:hover { background: #C9BEEA; }
+#custom-assistant { background: #DCD3F2; color: #4B3FA0; border-radius: 12px; padding: 4px 12px; margin: 6px 4px; }
+#custom-assistant:hover { background: #C9BEEA; }
 #custom-home { background: #DCD3F2; color: #4B3FA0; border-radius: 12px; padding: 4px 18px; margin: 6px 8px; }
 #custom-home:hover { background: #C9BEEA; }
 #clock { color: #8A86A0; padding: 0 16px; }

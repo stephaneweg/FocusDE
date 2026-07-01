@@ -178,6 +178,8 @@ window#waybar { background: %(bg)s; color: %(accent_ink)s; }
 #custom-panel:hover { background: %(accent_strong)s; }
 #custom-secondary { background: %(accent)s; color: %(accent_ink)s; border-radius: 12px; padding: 4px 12px; margin: 6px 4px; }
 #custom-secondary:hover { background: %(accent_strong)s; }
+#custom-assistant { background: %(accent)s; color: %(accent_ink)s; border-radius: 12px; padding: 4px 12px; margin: 6px 4px; }
+#custom-assistant:hover { background: %(accent_strong)s; }
 #custom-home { background: %(accent)s; color: %(accent_ink)s; border-radius: 12px; padding: 4px 18px; margin: 6px 8px; }
 #custom-home:hover { background: %(accent_strong)s; }
 #clock { color: %(ink_soft)s; padding: 0 16px; }
