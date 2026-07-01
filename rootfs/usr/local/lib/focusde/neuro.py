@@ -12,10 +12,21 @@ gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk, GLib, Gdk, GdkPixbuf
 GLib.set_prgname("focus-assistant")
 
-OLLAMA_URL = os.environ.get("NEURO_OLLAMA", "http://127.0.0.1:11434/api/chat")
-MODEL = os.environ.get("NEURO_MODEL", "qwen2.5:1.5b")
 ASSET = os.path.join(LIB, "assistant")
 CONFDIR = os.path.expanduser("~/.config/focus/assistant")
+
+def _load_config():
+    try:
+        return json.load(open(os.path.join(CONFDIR, "config.json"), encoding="utf-8"))
+    except Exception:
+        return {}
+_CFG = _load_config()
+# API compatible OpenAI. Défaut = Groq ; on peut pointer Mistral/Gemini/un Ollama local
+# via ~/.config/focus/assistant/config.json (base_url, model, api_key).
+BASE_URL = os.environ.get("NEURO_BASE_URL") or _CFG.get("base_url") \
+    or "https://api.groq.com/openai/v1/chat/completions"
+MODEL = os.environ.get("NEURO_MODEL") or _CFG.get("model") or "llama-3.3-70b-versatile"
+API_KEY = os.environ.get("NEURO_API_KEY") or _CFG.get("api_key") or ""
 
 def _card():
     try:
@@ -140,25 +151,34 @@ class Neuro(Gtk.Window):
         threading.Thread(target=self._stream, daemon=True).start()
 
     def _stream(self):
+        if not API_KEY:
+            GLib.idle_add(self._append, "Pas de clé API configurée. Ajoute ta clé dans "
+                          "~/.config/focus/assistant/config.json (champ « api_key »).")
+            GLib.idle_add(self._finish)
+            return
         payload = {"model": MODEL, "stream": True,
                    "messages": [{"role": "system", "content": SYSTEM}]
                    + [{"role": m["role"], "content": m["content"]} for m in self.msgs]}
+        headers = {"Content-Type": "application/json", "Authorization": "Bearer " + API_KEY}
         try:
-            req = urllib.request.Request(OLLAMA_URL, data=json.dumps(payload).encode("utf-8"),
-                                         headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=180) as r:
-                for raw in r:
+            req = urllib.request.Request(BASE_URL, data=json.dumps(payload).encode("utf-8"), headers=headers)
+            with urllib.request.urlopen(req, timeout=120) as r:
+                for raw in r:                        # flux SSE compatible OpenAI
                     raw = raw.strip()
-                    if not raw:
+                    if not raw or not raw.startswith(b"data:"):
                         continue
-                    d = json.loads(raw)
-                    tok = d.get("message", {}).get("content", "")
+                    data = raw[5:].strip()
+                    if data == b"[DONE]":
+                        break
+                    try:
+                        d = json.loads(data)
+                    except Exception:
+                        continue
+                    tok = ((d.get("choices") or [{}])[0].get("delta") or {}).get("content") or ""
                     if tok:
                         GLib.idle_add(self._append, tok)
-                    if d.get("done"):
-                        break
         except Exception as e:                       # noqa: BLE001
-            GLib.idle_add(self._append, "\n[Hou… souci de connexion à Ollama : %s]" % e)
+            GLib.idle_add(self._append, "\n[souci de connexion : %s]" % e)
         GLib.idle_add(self._finish)
 
     def _append(self, tok):
