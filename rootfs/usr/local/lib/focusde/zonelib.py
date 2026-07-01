@@ -49,31 +49,11 @@ def hide(mark):
     sw("focus parent")
     sw("move scratchpad")
 
-def _is_ws_child(mark):
-    """True si le noeud marqué est enfant DIRECT d'un workspace."""
-    tree = get("get_tree")
-    res = [False]
-    def walk(n, parent_ws):
-        if mark in (n.get("marks") or []):
-            res[0] = parent_ws
-            return True
-        here_ws = n.get("type") == "workspace"
-        for c in (n.get("nodes") or []) + (n.get("floating_nodes") or []):
-            if walk(c, here_ws):
-                return True
-        return False
-    if tree:
-        walk(tree, False)
-    return res[0]
-
 def dock_right(mark):
-    """Rappelle la zone du scratchpad et l'ancre à DROITE (1/3) : on la sort vers la
-    droite jusqu'à être enfant direct du workspace (dé-imbrique, ne s'accumule pas)."""
+    """Rappelle la zone du scratchpad et la ré-ancre à droite (1/3)."""
     sw("[con_mark=%s] scratchpad show" % mark)
     sw("[con_mark=%s] floating disable" % mark)
-    for _ in range(12):
-        if _is_ws_child(mark):
-            break
-        sw("[con_mark=%s] move right" % mark)
-        time.sleep(0.05)
+    sw("[con_mark=%s] focus" % mark); sw("move down")
+    sw("[con_mark=%s] focus" % mark); sw("focus parent"); sw("layout splith")
+    sw("[con_mark=%s] focus" % mark); sw("split horizontal"); sw("layout tabbed")
     sw("[con_mark=%s] resize set width 33 ppt" % mark)
