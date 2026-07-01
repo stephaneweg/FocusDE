@@ -4,7 +4,7 @@
 # l'endpoint et la persona sont en dur, ça marche tout seul. Look pastel Focus DE,
 # avatar en haut, et mémoire PAR ACTIVITÉ (l'historique est stocké par slug de
 # workspace, donc chaque activité garde son propre fil).
-import gi, os, sys, json, threading, urllib.request, re
+import gi, os, sys, json, threading, urllib.request, re, subprocess, glob
 LIB = os.path.dirname(os.path.realpath(__file__))
 sys.path.insert(0, LIB)
 import focus_theme
@@ -27,6 +27,21 @@ BASE_URL = os.environ.get("NEURO_BASE_URL") or _CFG.get("base_url") \
     or "https://api.groq.com/openai/v1/chat/completions"
 MODEL = os.environ.get("NEURO_MODEL") or _CFG.get("model") or "llama-3.3-70b-versatile"
 API_KEY = os.environ.get("NEURO_API_KEY") or _CFG.get("api_key") or ""
+
+# --- Synthèse vocale (Piper, hors-ligne) ---
+PIPER_BIN = os.path.expanduser("~/piper/piper/piper")
+_voices = sorted(glob.glob(os.path.expanduser("~/piper/voices/*.onnx")))
+PIPER_VOICE = _voices[0] if _voices else None
+TTS_AVAILABLE = bool(PIPER_VOICE) and os.path.exists(PIPER_BIN)
+TTS_WAV = "/tmp/neuro_tts_%d.wav" % os.getpid()
+
+def save_config():
+    try:
+        p = os.path.join(CONFDIR, "config.json")
+        json.dump(_CFG, open(p, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+        os.chmod(p, 0o600)
+    except Exception:
+        pass
 
 def _card():
     try:
@@ -69,6 +84,8 @@ window { background: @bg@; }
 .inputrow entry { background: @bg@; color: @ink@; border-radius: 12px; padding: 8px 10px; border: 1px solid @border@; }
 .send { background: @accent_strong@; color: @accent_ink@; border-radius: 12px; padding: 6px 16px; font-weight: bold; }
 .send:hover { background: @accent@; }
+.tts { background: @bg@; border-radius: 12px; padding: 6px 10px; border: 1px solid @border@; }
+.tts:hover { background: @accent@; }
 """
 
 class Neuro(Gtk.Window):
@@ -79,6 +96,10 @@ class Neuro(Gtk.Window):
         self.streaming = False
         self.cur_label = None
         self.cur_text = ""
+        self.tts_on = TTS_AVAILABLE and bool(_CFG.get("tts", True))
+        self._tts_stop = threading.Event()
+        self._tts_cur = None
+        self._tts_thread = None
 
         root = Gtk.Box(orientation=Gtk.Orientation.VERTICAL)
         self.add(root)
@@ -106,6 +127,11 @@ class Neuro(Gtk.Window):
 
         # --- saisie ---
         row = Gtk.Box(spacing=6); row.get_style_context().add_class("inputrow")
+        if TTS_AVAILABLE:
+            self.tts_btn = Gtk.Button(label="🔊" if self.tts_on else "🔇")
+            self.tts_btn.get_style_context().add_class("tts")
+            self.tts_btn.connect("clicked", self._toggle_tts)
+            row.pack_start(self.tts_btn, False, False, 0)
         self.entry = Gtk.Entry(); self.entry.set_placeholder_text("Écris à Neuro…")
         self.entry.set_hexpand(True); self.entry.connect("activate", self.on_send)
         send = Gtk.Button(label="Envoyer"); send.get_style_context().add_class("send")
@@ -140,6 +166,7 @@ class Neuro(Gtk.Window):
         text = self.entry.get_text().strip()
         if not text:
             return
+        self._stop_speaking()                        # couper la voix en cours
         self.entry.set_text("")
         self.bubble("user", text)
         self.msgs.append({"role": "user", "content": text})
@@ -164,6 +191,54 @@ class Neuro(Gtk.Window):
             self.mood = mood
         except Exception:
             pass
+
+    def _toggle_tts(self, btn):
+        self.tts_on = not self.tts_on
+        btn.set_label("🔊" if self.tts_on else "🔇")
+        _CFG["tts"] = self.tts_on
+        save_config()
+        if not self.tts_on:
+            self._stop_speaking()
+
+    def _stop_speaking(self):
+        self._tts_stop.set()
+        p = self._tts_cur
+        if p and p.poll() is None:
+            try:
+                p.terminate()
+            except Exception:
+                pass
+
+    def _start_speaking(self, text):
+        self._stop_speaking()
+        if self._tts_thread and self._tts_thread.is_alive():
+            self._tts_thread.join(timeout=0.4)
+        self._tts_stop = threading.Event()
+        self._tts_thread = threading.Thread(target=self._speak, args=(text,), daemon=True)
+        self._tts_thread.start()
+
+    def _speak(self, text):
+        # lit la réponse phrase par phrase (Piper synth -> aplay), annulable.
+        clean = re.sub(r"[*#`>_\[\]]", "", text)
+        clean = re.sub(r"\s+", " ", clean).strip()
+        for sent in re.split(r"(?<=[.!?…:])\s+", clean):
+            if self._tts_stop.is_set():
+                return
+            sent = sent.strip()
+            if not sent:
+                continue
+            try:
+                piper = subprocess.Popen([PIPER_BIN, "--model", PIPER_VOICE, "--output_file", TTS_WAV],
+                                         stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                self._tts_cur = piper
+                piper.communicate(sent.encode("utf-8"))
+                if self._tts_stop.is_set():
+                    return
+                play = subprocess.Popen(["aplay", "-q", TTS_WAV], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                self._tts_cur = play
+                play.wait()
+            except Exception:
+                return
 
     def _stream(self):
         if not API_KEY:
@@ -217,8 +292,12 @@ class Neuro(Gtk.Window):
 
     def _finish(self):
         self.streaming = False
+        if not self.mood_parsed:
+            self.set_mood("neutre")
         self.msgs.append({"role": "assistant", "content": self.cur_text})
         save_hist(self.scope, self.msgs)
+        if self.tts_on and self.cur_text.strip():
+            self._start_speaking(self.cur_text)     # lecture auto de la réponse
         return False
 
     def _to_bottom(self):
