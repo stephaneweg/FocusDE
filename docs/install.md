@@ -78,6 +78,34 @@ To drive the desktop of a Pi with no monitor, see
 [`scripts/setup-remote.sh`](../scripts/setup-remote.sh): it installs **WayVNC**
 (headless Sway + an SSH tunnel) so you can view and control the session.
 
+## The assistant (Professeur Neuro) — optional setup
+
+The built-in assistant (see the [user manual §10](user-manual.md)) needs two things,
+neither installed by default:
+
+1. **An API key.** Neuro talks to a fast cloud model through an OpenAI-compatible API.
+   Create `~/.config/focus/assistant/config.json` (mode `600`):
+
+   ```json
+   {
+     "base_url": "https://api.groq.com/openai/v1/chat/completions",
+     "model": "llama-3.3-70b-versatile",
+     "api_key": "YOUR_KEY",
+     "tts": true
+   }
+   ```
+
+   A free **Groq** key works well; you can point `base_url`/`model` at any
+   OpenAI-compatible endpoint. Add `"tavily_key": "…"` and `"search": true` to let Neuro
+   cite trusted educational sources.
+
+2. **The offline voice** (for read-aloud): run [`scripts/install-piper.sh`](../scripts/install-piper.sh),
+   which fetches **Piper** and a French voice into `~/piper/`. Without it, Neuro still
+   chats — just silently (the 🔊 button hides).
+
+> On a network with a broken IPv6 route the API calls could stall ~60 s; Neuro forces
+> IPv4-first resolution to avoid this.
+
 ## Where files are installed
 
 | Location | Contents |
