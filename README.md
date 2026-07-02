@@ -22,6 +22,9 @@ on **Sway** (Wayland) and hosts **real** Linux applications inside.
   automatically.
 - 🔌 **Handy applets.** Clock, Notes, Calculator, Music, FM-Player, Reminders — right
   in the panel.
+- 🦉 **A learning companion.** *Professeur Neuro*, a friendly built-in assistant, answers
+  questions and helps with homework — it **talks** (offline voice), **reacts** with
+  expressions, keeps a **memory per activity**, and **adapts to the child's age**.
 - 🎹 **Built-in software.** Including **FM-Song Tracker**, a MIDI music tracker, and an
   **FM-Player** applet for `.fms` tunes.
 - 🛑 **Tidy up in one click.** Stop an activity to close all its windows and reclaim
@@ -37,6 +40,7 @@ on **Sway** (Wayland) and hosts **real** Linux applications inside.
 | ![Zones](docs/images/activity-zones.png) | **One activity, two screens** (primary left / secondary right, 2/3-1/3) plus a panel. Multiple apps become tabs. |
 | ![App picker](docs/images/picker.png) | **+ App**: pick the zone (**Principal** / **Secondaire**), then the application. All your Linux apps are there. |
 | ![Applets](docs/images/applets.png) | **Applets** in the panel: clock, notes, calculator, music, FM-Player, reminders. |
+| ![Professeur Neuro](docs/images/assistant.png) | **Professeur Neuro**, the assistant: chat that talks, reacts with expressions, remembers per activity and adapts to the child's age. |
 
 ## Built-in music: FM-Song Tracker
 

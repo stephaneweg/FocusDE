@@ -133,12 +133,30 @@ same definitions.
 **Agenda / notes** — `agenda.py` (floating agenda window), `event_dialog.py`,
 `note_dialog.py`; data in `…/.config/focus/{agenda.json,notes/<scope>.json}`.
 
+**Assistant (Professeur Neuro)** — `neuro.py`: a lightweight GTK3 chat that streams from
+an **OpenAI-compatible** API (default **Groq**, `llama-3.3-70b-versatile`) configured in
+`~/.config/focus/assistant/config.json` (`base_url`/`model`/`api_key`, chmod 600). It keeps
+a **per-activity history** (`assistant/<slug>.json`), shows a large **mood avatar** driven by
+a `[humeur:X]` tag the model emits (parsed then stripped; images in `assistant/moods/*.png`),
+reads replies aloud with **Piper** (offline TTS, sentence-by-sentence in step with the text;
+🔊/🔇 toggle persisted in the config), and **adapts to age** — the child's **birthdate** is
+stored globally in `~/.config/focus/user.json` (asked on first run, or parsed from "j'ai X
+ans"), recomputed each turn and injected into the prompt along with the current activity
+title. `neuro_search.py` is an optional **RAG** step (web via Tavily + academic via OpenAlex,
+Wikipedia excluded; off unless `"search": true`) and also forces **IPv4-first** name
+resolution for the whole process (a broken IPv6 path otherwise stalls the API calls ~60 s).
+The persona lives in `assistant/professeur-neuro.json`. `assistant_toggle.py` (the bar
+button) tracks the assistant **per activity** via a `Zasst_<wsid>` mark and runs it as a **tab
+of the secondary zone** (`add secondary`): visible → kill the tab (secondary folds if it was
+alone); folded → reveal; absent → add + mark.
+
 **Panel (waybar)** — `…/.config/waybar/{config.jsonc,style.css}` and the per-user
 button scripts: `activity-name.sh` (title + switcher), `add-btn.sh` (**+ App**),
-`panel-btn.sh` (**Panneau**), `secondary-btn.sh` (**Secondaire**, shown only when a
-secondary zone exists), `home-btn.sh` (**Accueil**), `stop-btn.sh` (**✕**, red, shown
-only inside an activity). The waybar style is also produced from
-`focus_theme.WAYBAR_STYLE` when the theme changes (so button styles survive a theme
+`assistant-btn.sh` (**🦉 Neuro** — an **image** module: the script prints the avatar image
+path, empty on the Home to hide it), `panel-btn.sh` (**Panneau**), `secondary-btn.sh`
+(**Secondaire**, shown only when a secondary zone exists), `home-btn.sh` (**Accueil**),
+`stop-btn.sh` (**✕**, red, shown only inside an activity). The waybar style is also produced
+from `focus_theme.WAYBAR_STYLE` when the theme changes (so button styles survive a theme
 switch).
 
 **Boot / helpers** — `focus_boot.sh` (session boot: wait for Sway, build the Home,
@@ -155,6 +173,8 @@ fallback that execs Sway on tty1).
 | `agenda.json` | agenda events (shared by the Agenda and the Rappel applet) |
 | `hubs/<slug>.list` | apps pinned into a hub |
 | `name` | display name used in the Home greeting |
+| `user.json` | global user profile (birthdate → the assistant's age adaptation) |
+| `assistant/<slug>.json`, `assistant/config.json` | per-activity chat history; assistant API/voice config |
 
 All keyed by `slug(activity_name)`, so panel/notes/theme stay aligned across an
 activity's lifetime regardless of its Sway workspace id.

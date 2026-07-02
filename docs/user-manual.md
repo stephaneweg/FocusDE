@@ -38,6 +38,7 @@ A discreet **bar** sits at the top. From left to right:
 |--------|------|
 | *(left)* activity name | the current activity — click it to open the **activity switcher** |
 | **+ App** | add an application (opens the picker) |
+| **🦉 Neuro** *(avatar)* | open / close **Professeur Neuro**, the assistant, in the secondary zone (§10) — *appears only inside an activity* |
 | **Panneau** | show / hide the applet panel (left) |
 | **Secondaire** | collapse / restore the secondary zone (right) — *appears only when a secondary zone exists* |
 | **Accueil** | go back to the overview (Home) |
@@ -328,7 +329,53 @@ according to the order list, looping.
 
 ---
 
-## 10. Themes
+## 10. Professeur Neuro — the assistant
+
+![Professeur Neuro answering in the secondary zone](images/assistant.png)
+
+**Professeur Neuro** is a friendly built-in **learning companion** — an original
+owl-with-Einstein-hair character. He answers questions and helps with homework in a warm
+but **rigorous** teacher's tone (real content, the right words, no filler). He lives as a
+tab in the **secondary** zone of the current activity.
+
+**Open / close him.** Click the **🦉 Neuro** button (his avatar) in the top bar. He opens
+on the right (secondary zone); click the button again to **close** his tab — if he was the
+only app there, the secondary zone folds away. The button appears only **inside an
+activity** (not on the Home).
+
+**Chat.** Type your question at the bottom and press **Envoyer** (Send). He replies clearly,
+at the right level for the reader.
+
+**He talks** 🔊. Neuro **reads his answers aloud** with an offline voice (no internet needed
+for the speech). The text appears in step with the voice, sentence by sentence. Use the
+**🔊 / 🔇** button in the input row to turn the voice off or on. *(The sound comes out of the
+Raspberry Pi's own audio output — headphones or speakers on the jack/HDMI — not through a
+remote screen-sharing session.)*
+
+**He reacts** 🎭. A large avatar above the chat shows his **mood**: thinking while he
+prepares an answer, happy when things go well, proud when you succeed, surprised,
+or gently hurt if spoken to harshly.
+
+**A memory per activity.** Each activity keeps its **own** conversation, so the maths
+activity and the history activity don't mix. Switching activity switches the thread.
+
+**Adapts to age.** The **first time**, Neuro asks the child's **age** and remembers it (as a
+birthday, so it stays up to date). You can also just tell him in a sentence — *"j'ai 8 ans"*
+— and he adjusts on the spot: simpler words for the youngest, more precise vocabulary for
+older children. The rigour stays the same at every age.
+
+**Trusted sources (optional).** Neuro can back his answers with **reliable educational
+sources** (universities, science outlets… never Wikipedia). This is **off by default** for
+speed; enable it by adding `"search": true` to the assistant config (see below).
+
+> **Setup.** Neuro talks to a fast cloud model (Groq by default) through
+> `~/.config/focus/assistant/config.json` (`base_url`, `model`, `api_key`; optional
+> `tavily_key` for sources and `tts` for the voice). A free API key is enough. The offline
+> voice uses **Piper** — install it with `scripts/install-piper.sh`.
+
+---
+
+## 11. Themes
 
 ![Choosing a theme](images/theme-picker.png)
 
@@ -413,7 +460,7 @@ ignored, so the desktop always has themes.)
 
 ---
 
-## 11. Keyboard shortcuts
+## 12. Keyboard shortcuts
 
 `Super` = the logo key (Windows / ⌘).
 
